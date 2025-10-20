@@ -46,10 +46,9 @@ public class Delivery {
     @ToString.Exclude
     private Courier courier;
 
-    public Delivery(String recipient, double weight, String address, DeliveryStatus status) {
+    public Delivery(String recipient, double weight, String address) {
         this.recipient = recipient;
         this.weight = weight;
         this.address = address;
-        this.status = status;
     }
 }
