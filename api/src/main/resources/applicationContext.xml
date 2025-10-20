@@ -54,4 +54,8 @@
     <bean id="courierService" class="io.github.alirostom1.smartlogi.service.CourierServiceImpl">
         <constructor-arg name="courierRepo" ref="courierRepo"></constructor-arg>
     </bean>
+    <bean id="deliveryService" class="io.github.alirostom1.smartlogi.service.DeliveryServiceImpl">
+        <property name="courierRepo" ref="courierRepo"></property>
+        <property name="deliveryRepo" ref="deliveryRepo"></property>
+    </bean>
 </beans>

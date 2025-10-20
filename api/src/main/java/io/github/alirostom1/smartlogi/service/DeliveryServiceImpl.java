@@ -16,6 +16,9 @@ public class DeliveryServiceImpl implements DeliveryService{
     public void setCourierRepo(CourierRepo courierRepo) {
         this.courierRepo = courierRepo;
     }
+    public void setDeliveryRepo(DeliveryRepo deliveryRepo) {
+        this.deliveryRepo = deliveryRepo;
+    }
 
     @Override
     public Delivery createDelivery(String recipient, String address, double weight, UUID courierId) {
