@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -31,6 +32,9 @@ public class Courier{
 
     @Column(name = "phone_number",nullable = false,unique = true)
     private String phoneNumber;
+
+    @OneToMany(mappedBy = "courier",cascade = CascadeType.ALL)
+    private List<Delivery> deliveries;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
