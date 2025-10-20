@@ -7,5 +7,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CourierRepo extends JpaRepository<Courier, UUID> {
-    public Optional<Courier> findByPhoneNumber();
+    public boolean existsByPhoneNumber(String phone);
+    public boolean existsByPhoneNumberAndIdNot(String phone,UUID id);
 }
