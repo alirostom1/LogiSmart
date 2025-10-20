@@ -13,8 +13,6 @@
            http://www.springframework.org/schema/tx
            https://www.springframework.org/schema/tx/spring-tx.xsd">
 
-    <!-- Component scanning -->
-    <context:component-scan base-package="io.github.alirostom1.smartlogi"/>
 
     <!-- Enable JPA repositories -->
     <jpa:repositories base-package="io.github.alirostom1.smartlogi.repository"/>
