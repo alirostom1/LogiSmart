@@ -10,7 +10,7 @@ public interface CourierService {
     Courier createCourier(String firstName, String lastName, String vehicle, String phone);
     Courier updateCourier(UUID id, String firstName, String lastName, String vehicle, String phone);
     List<Courier> getAllCouriers();
-    Optional<Courier> getCourierById(UUID id);
+    Courier getCourierById(UUID id);
     void deleteCourierById(UUID id);
 
 }

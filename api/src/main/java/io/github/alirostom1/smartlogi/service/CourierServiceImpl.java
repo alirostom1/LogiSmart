@@ -41,8 +41,9 @@ public class CourierServiceImpl implements CourierService {
     public List<Courier> getAllCouriers(){
         return courierRepo.findAll();
     }
-    public Optional<Courier> getCourierById(UUID id){
-        return courierRepo.findById(id);
+    public Courier getCourierById(UUID id){
+        return courierRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Courier with id: " + id + "not found!"));
     }
     public void deleteCourierById(UUID id){
         if(!courierRepo.existsById(id)){
