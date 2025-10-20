@@ -16,6 +16,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "couriers")
 public class Courier{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
