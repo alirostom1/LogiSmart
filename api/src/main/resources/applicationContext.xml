@@ -51,4 +51,7 @@
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>
+    <bean id="courierService" class="io.github.alirostom1.smartlogi.service.CourierServiceImpl">
+        <constructor-arg name="courierRepo" ref="courierRepo"></constructor-arg>
+    </bean>
 </beans>
