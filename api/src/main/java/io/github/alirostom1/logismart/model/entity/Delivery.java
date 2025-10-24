@@ -1,7 +1,8 @@
-package io.github.alirostom1.smartlogi.model.entity;
+package io.github.alirostom1.logismart.model.entity;
 
 
-import io.github.alirostom1.smartlogi.model.enums.DeliveryStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.github.alirostom1.logismart.model.enums.DeliveryStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,19 +37,22 @@ public class Delivery {
     private DeliveryStatus status = DeliveryStatus.PREPARATION;
 
     @CreationTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "courier_id")
     @ToString.Exclude
     private Courier courier;
 
-    public Delivery(String recipient, double weight, String address) {
+    public Delivery(String recipient, double weight, String address,DeliveryStatus status) {
         this.recipient = recipient;
         this.weight = weight;
         this.address = address;
+        this.status = status;
     }
 }

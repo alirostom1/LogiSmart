@@ -1,6 +1,8 @@
-package io.github.alirostom1.smartlogi.model.entity;
+package io.github.alirostom1.logismart.model.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,13 +36,16 @@ public class Courier{
     @Column(name = "phone_number",nullable = false,unique = true)
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "courier",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "courier",fetch = FetchType.EAGER)
+    @JsonIgnore
     private List<Delivery> deliveries;
 
     @CreationTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
 
     public Courier(String lastName, String firstName, String vehicle, String phoneNumber) {
