@@ -42,10 +42,12 @@ public class Courier{
 
     @CreationTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     public Courier(String lastName, String firstName, String vehicle, String phoneNumber) {

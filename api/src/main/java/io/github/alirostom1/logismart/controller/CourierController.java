@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/couriers")
+@RequestMapping("/api/v2/couriers")
 public class CourierController{
     private CourierService courierService;
 
