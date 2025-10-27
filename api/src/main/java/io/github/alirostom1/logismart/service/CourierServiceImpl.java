@@ -7,10 +7,12 @@ import io.github.alirostom1.logismart.dto.courierdto.UpdateCourierDto;
 import io.github.alirostom1.logismart.model.entity.Courier;
 import io.github.alirostom1.logismart.repository.CourierRepo;
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Service
 @Transactional
 public class CourierServiceImpl implements CourierService {
     private CourierRepo courierRepo;

@@ -1,0 +1,105 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1761577041634-1
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_couriers
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: first_name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: vehicle
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: phone_number
+                  type: VARCHAR(255)
+              - column:
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  name: updated_at
+                  type: DATETIME
+            tableName: couriers
+  - changeSet:
+      id: 1761577041634-2
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_deliveries
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: recipient
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: weight
+                  type: DOUBLE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: address
+                  type: VARCHAR(255)
+              - column:
+                  name: status
+                  type: VARCHAR(255)
+              - column:
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: courier_id
+                  type: UUID
+            tableName: deliveries
+  - changeSet:
+      id: 1761577041634-4
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: phone_number
+            constraintName: uc_couriers_phone_number
+            tableName: couriers
+  - changeSet:
+      id: 1761577041634-5
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: courier_id
+            baseTableName: deliveries
+            constraintName: FK_DELIVERIES_ON_COURIER
+            referencedColumnNames: id
+            referencedTableName: couriers
+

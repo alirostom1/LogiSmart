@@ -10,10 +10,12 @@ import io.github.alirostom1.logismart.model.enums.DeliveryStatus;
 import io.github.alirostom1.logismart.repository.CourierRepo;
 import io.github.alirostom1.logismart.repository.DeliveryRepo;
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Service
 @Transactional
 public class DeliveryServiceImpl implements DeliveryService{
     private DeliveryRepo deliveryRepo;

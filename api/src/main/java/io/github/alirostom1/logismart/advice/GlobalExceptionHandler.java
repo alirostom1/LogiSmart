@@ -99,7 +99,7 @@ public class GlobalExceptionHandler {
 
         ApiResponse response = new ApiResponse(
                 500,
-                "Internal Server Error. Please try again later."
+                "Internal Server Error. Please try again later." + ex.getMessage()
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
