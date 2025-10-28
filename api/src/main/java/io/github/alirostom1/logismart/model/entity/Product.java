@@ -3,6 +3,7 @@ package io.github.alirostom1.logismart.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -22,4 +23,7 @@ public class Product {
 
     @Column(name = "unit_price",nullable = false)
     private double unitPrice;
+
+    @OneToMany(mappedBy = "product",fetch = FetchType.EAGER)
+    private List<DeliveryProduct> deliveryProduct;
 }

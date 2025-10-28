@@ -40,6 +40,10 @@ public class Courier{
     @JsonIgnore
     private List<Delivery> deliveries;
 
+    @ManyToOne
+    @JoinColumn(name = "zone_id",nullable = false)
+    private Zone zone;
+
     @CreationTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "created_at")

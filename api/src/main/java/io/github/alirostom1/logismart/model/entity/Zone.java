@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -21,4 +22,9 @@ public class Zone {
 
     @Column(name = "postal_code",nullable = false,unique = true)
     private int postalCode;
+
+    @OneToMany(mappedBy = "zone",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    private List<Courier> courier;
+    @OneToMany(mappedBy = "zone",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<Delivery> deliveries;
 }

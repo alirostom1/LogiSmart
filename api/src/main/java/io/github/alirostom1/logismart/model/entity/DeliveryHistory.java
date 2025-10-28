@@ -30,4 +30,8 @@ public class DeliveryHistory {
     @Column(columnDefinition = "TEXT")
     private String comment;
 
+    @ManyToOne
+    @JoinColumn(name = "delivery_id",nullable = false)
+    private Delivery delivery;
+
 }

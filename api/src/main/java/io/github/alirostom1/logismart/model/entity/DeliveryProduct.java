@@ -1,8 +1,6 @@
 package io.github.alirostom1.logismart.model.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -21,4 +19,12 @@ public class DeliveryProduct{
     @CreationTimestamp
     @Column(name = "added_at")
     private LocalDateTime addedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "delivery_id",nullable = false)
+    private Delivery delivery;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id",nullable = false)
+    private Product product;
 }

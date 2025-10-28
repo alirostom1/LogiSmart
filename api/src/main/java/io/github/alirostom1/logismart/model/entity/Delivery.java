@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -38,6 +39,20 @@ public class Delivery {
     @Enumerated(EnumType.STRING)
     private DeliveryPriority priority = DeliveryPriority.MEDIUM;
 
+    @ManyToOne
+    @JoinColumn(name = "zone_id",nullable = false)
+    private Zone zone;
+
+    @ManyToOne
+    @JoinColumn(name = "recipient_id",nullable = false)
+    private Recipient recipient;
+
+    @ManyToOne
+    @JoinColumn(name = "sender_id",nullable = false)
+    private Sender sender;
+
+    @OneToMany(mappedBy = "delivery",fetch = FetchType.EAGER)
+    private List<DeliveryProduct> deliveryProducts;
 
     @CreationTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -52,4 +67,7 @@ public class Delivery {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "courier_id")
     private Courier courier;
+
+    @OneToMany(mappedBy = "delivery",fetch = FetchType.EAGER)
+    private List<DeliveryHistory> deliveryHistoryList;
 }
