@@ -21,10 +21,12 @@ public class DeliveryProduct{
     private LocalDateTime addedAt;
 
     @ManyToOne
-    @JoinColumn(name = "delivery_id",nullable = false)
+    @MapsId("deliveryId")
+    @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 
     @ManyToOne
-    @JoinColumn(name = "product_id",nullable = false)
+    @MapsId("productId")
+    @JoinColumn(name = "product_id")
     private Product product;
 }

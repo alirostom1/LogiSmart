@@ -30,32 +30,12 @@ public class DeliveryServiceImpl implements DeliveryService{
 
     @Override
     public Delivery createDelivery(CreateDeliveryDto dto) {
-        Courier courier = courierRepo.findById(UUID.fromString(dto.getCourrierID()))
-                .orElseThrow(()-> new CourierNotFoundException(UUID.fromString(dto.getCourrierID())));
-        Delivery delivery = new Delivery(
-                dto.getRecipient(),
-                dto.getWeight(),
-                dto.getAddress(),
-                DeliveryStatus.valueOf(dto.getStatus().toUpperCase())
-        );
-        delivery.setCourier(courier);
-        return deliveryRepo.save(delivery);
+        return new Delivery();
     }
 
     @Override
     public Delivery updateDelivery(UpdateDeliveryDto dto) {
-        Delivery delivery = deliveryRepo.findById(dto.getId())
-                .orElseThrow(() -> new DeliveryNotFoundException(dto.getId()));
-        delivery.setRecipient(dto.getRecipient());
-        delivery.setAddress(dto.getAddress());
-        delivery.setWeight(dto.getWeight());
-        delivery.setStatus(DeliveryStatus.valueOf(dto.getStatus().toUpperCase()));
-        if(!delivery.getCourier().getId().equals(dto.getCourrierID())){
-            Courier courier = courierRepo.findById(UUID.fromString(dto.getCourrierID()))
-                    .orElseThrow(()->new CourierNotFoundException(UUID.fromString(dto.getCourrierID())));
-            delivery.setCourier(courier);
-        }
-        return deliveryRepo.save(delivery);
+        return new Delivery();
     }
 
     @Override
