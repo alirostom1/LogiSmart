@@ -2,20 +2,19 @@ package io.github.alirostom1.logismart.model.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.github.alirostom1.logismart.model.enums.DeliveryPriority;
 import io.github.alirostom1.logismart.model.enums.DeliveryStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Data
+@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "deliveries")
@@ -24,17 +23,36 @@ public class Delivery {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
-    private String recipient;
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(name = "destination_city",nullable = false)
+    private String destinationCity;
 
     @Column(nullable = false)
     private double weight;
 
-    @Column(nullable = false)
-    private String address;
 
     @Enumerated(EnumType.STRING)
-    private DeliveryStatus status = DeliveryStatus.PREPARATION;
+    private DeliveryStatus status = DeliveryStatus.CREATED;
+
+    @Enumerated(EnumType.STRING)
+    private DeliveryPriority priority = DeliveryPriority.MEDIUM;
+
+    @ManyToOne
+    @JoinColumn(name = "zone_id",nullable = false)
+    private Zone zone;
+
+    @ManyToOne
+    @JoinColumn(name = "recipient_id",nullable = false)
+    private Recipient recipient;
+
+    @ManyToOne
+    @JoinColumn(name = "sender_id",nullable = false)
+    private Sender sender;
+
+    @OneToMany(mappedBy = "delivery",fetch = FetchType.EAGER)
+    private List<DeliveryProduct> deliveryProducts;
 
     @CreationTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -48,13 +66,8 @@ public class Delivery {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "courier_id")
-    @ToString.Exclude
     private Courier courier;
 
-    public Delivery(String recipient, double weight, String address,DeliveryStatus status) {
-        this.recipient = recipient;
-        this.weight = weight;
-        this.address = address;
-        this.status = status;
-    }
+    @OneToMany(mappedBy = "delivery",fetch = FetchType.EAGER)
+    private List<DeliveryHistory> deliveryHistoryList;
 }
