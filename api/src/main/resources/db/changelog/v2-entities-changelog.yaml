@@ -1,0 +1,356 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1761657821012-1
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_deliveryhistory
+                  name: id
+                  type: UUID
+              - column:
+                  name: status
+                  type: VARCHAR(255)
+              - column:
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: comment
+                  type: TEXT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: delivery_id
+                  type: UUID
+            tableName: delivery_history
+  - changeSet:
+      id: 1761657821012-2
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: quanitity
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: price
+                  type: DOUBLE
+              - column:
+                  name: added_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_deliveryproduct
+                  name: product_id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_deliveryproduct
+                  name: delivery_id
+                  type: UUID
+            tableName: delivery_product
+  - changeSet:
+      id: 1761657821012-3
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_persons
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: type
+                  type: VARCHAR(31)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: first_name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: phone
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: address
+                  type: VARCHAR(255)
+            tableName: persons
+  - changeSet:
+      id: 1761657821012-4
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_products
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: category
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: unit_price
+                  type: DOUBLE
+            tableName: products
+  - changeSet:
+      id: 1761657821012-5
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_zones
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: postal_code
+                  type: INT
+            tableName: zones
+  - changeSet:
+      id: 1761657821012-6
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: destination_city
+                  type: VARCHAR(255)
+              - column:
+                  name: priority
+                  type: VARCHAR(255)
+              - column:
+                  name: recipient_id
+                  type: UUID
+              - column:
+                  name: sender_id
+                  type: UUID
+              - column:
+                  name: zone_id
+                  type: UUID
+            tableName: deliveries
+  - changeSet:
+      id: 1761657821012-8
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnName: destination_city
+            tableName: deliveries
+  - changeSet:
+      id: 1761657821012-11
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnName: recipient_id
+            tableName: deliveries
+  - changeSet:
+      id: 1761657821012-13
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnName: sender_id
+            tableName: deliveries
+  - changeSet:
+      id: 1761657821012-14
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: zone_id
+                  type: UUID
+            tableName: couriers
+  - changeSet:
+      id: 1761657821012-15
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnName: zone_id
+            tableName: couriers
+  - changeSet:
+      id: 1761657821012-17
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnName: zone_id
+            tableName: deliveries
+  - changeSet:
+      id: 1761657821012-18
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: email
+            constraintName: uc_persons_email
+            tableName: persons
+  - changeSet:
+      id: 1761657821012-19
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: name
+            constraintName: uc_products_name
+            tableName: products
+  - changeSet:
+      id: 1761657821012-20
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: postal_code
+            constraintName: uc_zones_postal_code
+            tableName: zones
+  - changeSet:
+      id: 1761657821012-21
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: zone_id
+            baseTableName: couriers
+            constraintName: FK_COURIERS_ON_ZONE
+            referencedColumnNames: id
+            referencedTableName: zones
+  - changeSet:
+      id: 1761657821012-22
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: recipient_id
+            baseTableName: deliveries
+            constraintName: FK_DELIVERIES_ON_RECIPIENT
+            referencedColumnNames: id
+            referencedTableName: persons
+  - changeSet:
+      id: 1761657821012-23
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: sender_id
+            baseTableName: deliveries
+            constraintName: FK_DELIVERIES_ON_SENDER
+            referencedColumnNames: id
+            referencedTableName: persons
+  - changeSet:
+      id: 1761657821012-24
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: zone_id
+            baseTableName: deliveries
+            constraintName: FK_DELIVERIES_ON_ZONE
+            referencedColumnNames: id
+            referencedTableName: zones
+  - changeSet:
+      id: 1761657821012-25
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: delivery_id
+            baseTableName: delivery_history
+            constraintName: FK_DELIVERYHISTORY_ON_DELIVERY
+            referencedColumnNames: id
+            referencedTableName: deliveries
+  - changeSet:
+      id: 1761657821012-26
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: delivery_id
+            baseTableName: delivery_product
+            constraintName: FK_DELIVERYPRODUCT_ON_DELIVERY
+            referencedColumnNames: id
+            referencedTableName: deliveries
+  - changeSet:
+      id: 1761657821012-27
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: product_id
+            baseTableName: delivery_product
+            constraintName: FK_DELIVERYPRODUCT_ON_PRODUCT
+            referencedColumnNames: id
+            referencedTableName: products
+  - changeSet:
+      id: 1761657821012-28
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropColumn:
+            columnName: address
+            tableName: deliveries
+        - dropColumn:
+            columnName: recipient
+            tableName: deliveries
+
