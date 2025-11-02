@@ -1,11 +1,16 @@
 package io.github.alirostom1.logismart.model.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter @Setter
+@NoArgsConstructor
 public class DeliveryProduct{
     @EmbeddedId
     private DeliveryProductId id;
