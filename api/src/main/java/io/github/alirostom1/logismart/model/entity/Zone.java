@@ -1,14 +1,13 @@
 package io.github.alirostom1.logismart.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @Entity
+@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "zones")
@@ -24,7 +23,7 @@ public class Zone {
     private int postalCode;
 
     @OneToMany(mappedBy = "zone",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    private List<Courier> courier;
+    private List<Courier> couriers;
     @OneToMany(mappedBy = "zone",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Delivery> deliveries;
 }
