@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("api/v2/zone")
+@RequestMapping("api/v2/zones")
 @RequiredArgsConstructor
 public class ZoneController {
     private final ZoneService zoneService;
@@ -73,9 +73,9 @@ public class ZoneController {
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<ZoneResponse>> delete(@PathVariable("id") @ValidUUID String id){
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable("id") @ValidUUID String id){
         zoneService.deleteZone(id);
-        ApiResponse<ZoneResponse> apiResponse = new ApiResponse<>(
+        ApiResponse<Void> apiResponse = new ApiResponse<>(
                 true,
                 "Zone deleted Successfully!",
                 null,
