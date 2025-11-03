@@ -5,7 +5,6 @@ import io.github.alirostom1.logismart.dto.request.person.UpdatePersonRequest;
 import io.github.alirostom1.logismart.dto.response.client.RecipientResponse;
 import io.github.alirostom1.logismart.dto.response.client.SenderResponse;
 import io.github.alirostom1.logismart.dto.response.common.PersonResponse;
-import io.github.alirostom1.logismart.model.enums.DeliveryStatus;
 import io.github.alirostom1.logismart.model.entity.Sender;
 import io.github.alirostom1.logismart.model.entity.Recipient;
 import org.mapstruct.*;
@@ -19,11 +18,11 @@ public interface PersonMapper {
     PersonResponse toResponse(Recipient recipient);
 
     @Mapping(target = "totalDeliveriesSent", expression = "java(sender.getDeliveries().size())")
-    @Mapping(target = "activeDeliveries", expression = "java((int) sender.getDeliveries().stream().filter(d -> d.getStatus() != DeliveryStatus.DELIVERED).count())")
+    @Mapping(target = "activeDeliveries", expression = "java((int) sender.getDeliveries().stream().filter(d -> d.getStatus() != io.github.alirostom1.logismart.model.enums.DeliveryStatus.DELIVERED).count())")
     SenderResponse toSenderResponse(Sender sender);
 
     @Mapping(target = "totalDeliveriesReceived", expression = "java(recipient.getDeliveries().size())")
-    @Mapping(target = "pendingDeliveries", expression = "java((int) recipient.getDeliveries().stream().filter(d -> d.getStatus() != DeliveryStatus.DELIVERED).count())")
+    @Mapping(target = "pendingDeliveries", expression = "java((int) recipient.getDeliveries().stream().filter(d -> d.getStatus() != io.github.alirostom1.logismart.model.enums.DeliveryStatus.DELIVERED).count())")
     RecipientResponse toRecipientResponse(Recipient recipient);
 
 

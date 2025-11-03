@@ -192,7 +192,7 @@ public class DeliveryService {
             DeliveryProduct deliveryProduct = new DeliveryProduct();
             deliveryProduct.setId(new DeliveryProductId(product.getId(),delivery.getId()));
             deliveryProduct.setPrice(totalPrice);
-            deliveryProduct.setQuanitity(productRequest.getQuantity());
+            deliveryProduct.setQuantity(productRequest.getQuantity());
             deliveryProduct.setDelivery(delivery);
             deliveryProduct.setProduct(product);
             deliveryProducts.add(deliveryProduct);

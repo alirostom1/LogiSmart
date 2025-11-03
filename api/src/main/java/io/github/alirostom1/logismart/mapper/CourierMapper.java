@@ -4,7 +4,6 @@ import io.github.alirostom1.logismart.dto.request.courier.CreateCourierRequest;
 import io.github.alirostom1.logismart.dto.request.courier.UpdateCourierRequest;
 import io.github.alirostom1.logismart.dto.response.courier.CourierResponse;
 import io.github.alirostom1.logismart.dto.response.courier.CourierWithDeliveriesResponse;
-import io.github.alirostom1.logismart.mapper.courier.CourierSimpleMapperImpl;
 import io.github.alirostom1.logismart.model.entity.Courier;
 import io.github.alirostom1.logismart.model.entity.Delivery;
 import io.github.alirostom1.logismart.model.enums.DeliveryStatus;

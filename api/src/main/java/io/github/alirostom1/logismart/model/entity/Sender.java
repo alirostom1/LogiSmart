@@ -4,15 +4,14 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter @Setter
 @DiscriminatorValue(value = "sender")
 public class Sender extends Person {
     @OneToMany(mappedBy = "sender",fetch = FetchType.EAGER)

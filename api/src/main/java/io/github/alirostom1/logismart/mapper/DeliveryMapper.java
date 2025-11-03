@@ -5,7 +5,6 @@ import io.github.alirostom1.logismart.dto.request.delivery.CreateDeliveryRequest
 import io.github.alirostom1.logismart.dto.response.delivery.DeliveryResponse;
 import io.github.alirostom1.logismart.dto.response.delivery.DeliveryDetailsResponse;
 import io.github.alirostom1.logismart.dto.response.delivery.DeliveryTrackingResponse;
-import io.github.alirostom1.logismart.mapper.courier.CourierSimpleMapperImpl;
 import io.github.alirostom1.logismart.model.entity.Delivery;
 import org.mapstruct.*;
 

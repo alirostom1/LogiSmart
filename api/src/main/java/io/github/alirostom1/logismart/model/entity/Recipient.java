@@ -11,6 +11,7 @@ import java.util.UUID;
 
 @Entity
 @DiscriminatorValue(value = "recipient")
+@Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Recipient extends Person{
