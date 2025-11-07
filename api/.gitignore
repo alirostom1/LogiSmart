@@ -41,3 +41,4 @@ build/
 tomcat.8080/
 
 .env
+logs/service-aspect.log
