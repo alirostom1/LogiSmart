@@ -36,16 +36,27 @@ public class Courier{
     @Column(name = "phone_number",nullable = false,unique = true)
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "courier",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "collectingCourier", fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Delivery> deliveries;
+    private List<Delivery> collectingDeliveries;
+
+    @OneToMany(mappedBy = "shippingCourier", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Delivery> shippingDeliveries;
+    
+
+    @ManyToOne
+    @JoinColumn(name = "zone_id",nullable = false)
+    private Zone zone;
 
     @CreationTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     public Courier(String lastName, String firstName, String vehicle, String phoneNumber) {

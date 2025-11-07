@@ -38,6 +38,7 @@ build/
 ### Mac OS ###
 .DS_Store
 
-src/main/resources/database.properties
-
 tomcat.8080/
+
+.env
+logs/service-aspect.log
