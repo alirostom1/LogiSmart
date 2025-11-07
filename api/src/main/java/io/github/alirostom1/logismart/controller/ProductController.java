@@ -7,6 +7,7 @@ import io.github.alirostom1.logismart.service.ProductService;
 import io.github.alirostom1.logismart.util.ValidUUID;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,9 +23,7 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ProductResponse>>> index(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "3") int size){
-        Pageable pageable = PageRequest.of(page,size);
+            @ParameterObject Pageable pageable){
         Page<ProductResponse> productsPage = productService.getAllProducts(pageable);
         ApiResponse<Page<ProductResponse>> apiResponse = new ApiResponse<>(
                 true,
