@@ -74,8 +74,8 @@ public class DeliveryService {
         }
 
         // CREATE DELIVERY HISTORY RECORD
-        saveToHistory(savedDelivery,DeliveryStatus.CREATED,"Delivery created");
-
+        DeliveryHistory deliveryHistory = saveToHistory(savedDelivery,DeliveryStatus.CREATED,"Delivery created");
+        savedDelivery.getDeliveryHistoryList().add(deliveryHistory);
         return deliveryMapper.toDetailsResponse(savedDelivery);
     }
 
@@ -101,27 +101,41 @@ public class DeliveryService {
         DeliveryStatus status = DeliveryStatus.valueOf(request.getStatus());
         delivery.setStatus(status);
         Delivery savedDelivery = deliveryRepo.save(delivery);
-        saveToHistory(savedDelivery,status,request.getComment());
+        DeliveryHistory deliveryHistory = saveToHistory(savedDelivery,status,request.getComment());
+        savedDelivery.getDeliveryHistoryList().add(deliveryHistory);
         return deliveryMapper.toDetailsResponse(savedDelivery);
     }
 
-    //ASSIGN COURIER TO A DELIVERY AFTER CREATION (FOR MANAGER)
-    public DeliveryDetailsResponse assignToCourier(String deliveryId,
+    //ASSIGN COURIER TO A COLLECT DELIVERY AFTER CREATION (FOR MANAGER)
+    public DeliveryDetailsResponse assignCollectingCourier(String deliveryId,
                                                    AssignDeliveryRequest request){
         Delivery delivery = findById(deliveryId);
         Courier courier = courierRepo.findById(UUID.fromString(request.getCourierId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Courier",request.getCourierId()));
-        delivery.setCourier(courier);
+        delivery.setCollectingCourier(courier);
         Delivery savedDelivery = deliveryRepo.save(delivery);
-        saveToHistory(savedDelivery,delivery.getStatus(),"Assigned to courier " +
+        saveToHistory(savedDelivery,delivery.getStatus(),"Collection Assigned to courier " +
                 courier.getFirstName() + " " + courier.getLastName());
         return deliveryMapper.toDetailsResponse(savedDelivery);
     }
+    //ASSIGN COURIER TO A SHIP DELIVERY AFTER CREATION (FOR MANAGER)
+    public DeliveryDetailsResponse assignShippingCourier(String deliveryId,
+                                                           AssignDeliveryRequest request){
+        Delivery delivery = findById(deliveryId);
+        Courier courier = courierRepo.findById(UUID.fromString(request.getCourierId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Courier",request.getCourierId()));
+        delivery.setShippingCourier(courier);
+        Delivery savedDelivery = deliveryRepo.save(delivery);
+        saveToHistory(savedDelivery,delivery.getStatus(),"Shipping Assigned to courier " +
+                courier.getFirstName() + " " + courier.getLastName());
+        return deliveryMapper.toDetailsResponse(savedDelivery);
+    }
+
     //SEARCH DELIVERY WITH MULTIPLE FILTERS AND SORT (FOR MORE DETAILS CHECK THE SEARCH REQUEST DTO),(( FOR MANAGER))
     @Transactional(readOnly = true)
-    public Page<DeliveryResponse> searchDeliveries(SearchDeliveryRequest request){
+    public Page<DeliveryResponse> searchDeliveries(SearchDeliveryRequest request,Pageable pageable){
         Specification<Delivery> spec = buildSearchSpecification(request);
-        Page<Delivery> deliveries = deliveryRepo.findAll(spec,request.getPageable());
+        Page<Delivery> deliveries = deliveryRepo.findAll(spec,pageable);
         return deliveries.map(deliveryMapper::toResponse);
     }
 
@@ -140,14 +154,16 @@ public class DeliveryService {
     //GET COURIER'S DELIVERIES(FOR COURIER)
     @Transactional(readOnly = true)
     public Page<DeliveryResponse> getDeliveriesByCourier(String courierId, Pageable pageable){
-        Page<Delivery> deliveries = deliveryRepo.findByCourierId(UUID.fromString(courierId),pageable);
+        UUID id = UUID.fromString(courierId);
+        Page<Delivery> deliveries = deliveryRepo.findByCollectingCourierIdOrShippingCourierId(id,id,pageable);
         return deliveries.map(deliveryMapper::toResponse);
     }
 
     //DELETE DELIVERY (FOR MANAGER)
     public void deleteDelivery(String deliveryId){
-        if(!deliveryRepo.existsById(UUID.fromString(deliveryId))){
-            throw new ResourceNotFoundException("Delivery",deliveryId);
+        Delivery delivery = findById(deliveryId);
+        if(delivery.getStatus() != DeliveryStatus.DELIVERED && delivery.getStatus() != DeliveryStatus.CREATED){
+            throw new RuntimeException("Couldn't delete a undelievered delivery!");
         }
         deliveryRepo.deleteById(UUID.fromString(deliveryId));
     }
@@ -156,12 +172,12 @@ public class DeliveryService {
 
     // UTIL METHODS
     // SAVE HISTORY UPDATE
-    private void saveToHistory(Delivery delivery, DeliveryStatus status,String comment){
+    private DeliveryHistory saveToHistory(Delivery delivery, DeliveryStatus status,String comment){
         DeliveryHistory history = new DeliveryHistory();
         history.setDelivery(delivery);
         history.setStatus(status);
         history.setComment(comment);
-        deliveryHistoryRepo.save(history);
+        return deliveryHistoryRepo.save(history);
     }
     // FIND DELIVERY BY ID AND THROW EXCEPTION IF NOT FOUND
     private Delivery findById(String deliveryId){

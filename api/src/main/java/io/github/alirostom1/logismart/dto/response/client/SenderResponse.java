@@ -1,5 +1,6 @@
 package io.github.alirostom1.logismart.dto.response.client;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.alirostom1.logismart.dto.response.common.PersonResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SenderResponse extends PersonResponse {
     private int totalDeliveriesSent;
     private int activeDeliveries;

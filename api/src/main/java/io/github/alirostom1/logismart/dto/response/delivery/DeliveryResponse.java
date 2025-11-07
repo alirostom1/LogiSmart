@@ -1,5 +1,6 @@
 package io.github.alirostom1.logismart.dto.response.delivery;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.alirostom1.logismart.model.enums.DeliveryPriority;
 import io.github.alirostom1.logismart.model.enums.DeliveryStatus;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DeliveryResponse {
     private String id;
     private String description;
@@ -21,7 +23,8 @@ public class DeliveryResponse {
     private String recipientName;
     private String senderName;
     private String zoneName;
-    private String assignedCourierName;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String collectingCourierName;
+    private String shippingCourierName;
+    private String createdAt;
+    private String updatedAt;
 }

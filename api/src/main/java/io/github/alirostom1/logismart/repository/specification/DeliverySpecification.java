@@ -61,8 +61,13 @@ public class DeliverySpecification {
         };
     }
     public static Specification<Delivery> hasCity(String city) {
-        return (root, query, criteriaBuilder) ->
-                StringUtils.hasText(city) ? criteriaBuilder.equal(root.get("destinationCity"), city) : criteriaBuilder.conjunction();
+        return (root, query, criteriaBuilder) -> {
+            if (!StringUtils.hasText(city)) {
+                return criteriaBuilder.conjunction();
+            }
+            String cityPattern = "%" + city.toLowerCase() + "%";
+            return criteriaBuilder.like(criteriaBuilder.lower(root.get("destinationCity")), cityPattern);
+        };
     }
     public static Specification<Delivery> hasCourierId(String courierId) {
         return (root, query, criteriaBuilder) -> {
@@ -71,7 +76,10 @@ public class DeliverySpecification {
             }
             try {
                 UUID courierUuid = UUID.fromString(courierId);
-                return criteriaBuilder.equal(root.get("courier").get("id"), courierUuid);
+                return criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("collectingCourier").get("id"), courierUuid),
+                        criteriaBuilder.equal(root.get("shippingCourier").get("id"), courierUuid)
+                );
             } catch (IllegalArgumentException e) {
                 return criteriaBuilder.conjunction();
             }

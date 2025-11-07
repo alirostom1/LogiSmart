@@ -54,20 +54,35 @@ public class Delivery {
     @OneToMany(mappedBy = "delivery",fetch = FetchType.EAGER)
     private List<DeliveryProduct> deliveryProducts;
 
-    @CreationTimestamp
+
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "courier_id")
-    private Courier courier;
+    @JoinColumn(name = "collecting_courier_id")
+    private Courier collectingCourier;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "shipping_courier_id")
+    private Courier shippingCourier;
 
     @OneToMany(mappedBy = "delivery",fetch = FetchType.EAGER)
     private List<DeliveryHistory> deliveryHistoryList;
+
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

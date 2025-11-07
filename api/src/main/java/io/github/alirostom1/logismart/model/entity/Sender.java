@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,5 +16,5 @@ import java.util.List;
 @DiscriminatorValue(value = "sender")
 public class Sender extends Person {
     @OneToMany(mappedBy = "sender",fetch = FetchType.EAGER)
-    private List<Delivery> deliveries;
+    private List<Delivery> deliveries = new ArrayList<>();
 }

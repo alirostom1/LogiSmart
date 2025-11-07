@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/v2-entities-changelog.yaml
   - include:
       file: db/changelog/rename_column_delivery_product_table.yml
+  - include:
+      file: db/changelog/modify_deliveries_table.yaml
