@@ -59,21 +59,22 @@ public class PersonService {
 
     // GET ALL SENDERS (FOR MANAGER)
     @Transactional(readOnly = true)
-    public Page<PersonResponse> getAllSenders(Pageable pageable) {
+    public Page<SenderResponse> getAllSenders(Pageable pageable) {
         Page<Sender> senders = personRepo.findSenders(pageable);
-        return senders.map(personMapper::toResponse);
+        return senders.map(personMapper::toSenderResponse);
     }
 
     // GET ALL RECIPIENTS (FOR MANAGER)
     @Transactional(readOnly = true)
-    public Page<PersonResponse> getAllRecipients(Pageable pageable) {
+    public Page<RecipientResponse> getAllRecipients(Pageable pageable) {
         Page<Recipient> recipients = personRepo.findRecipients(pageable);
-        return recipients.map(personMapper::toResponse);
+        return recipients.map(personMapper::toRecipientResponse);
     }
 
     // UPDATE SENDER (FOR MANAGER/SENDER)
     public SenderResponse updateSender(String senderId, UpdatePersonRequest request) {
         Sender sender = findSenderById(senderId);
+        validatePhoneAndEmailUpdate(request.getPhone(),request.getEmail(),sender.getId());
         personMapper.updateSenderFromRequest(request,sender);
         Sender updatedSender = personRepo.save(sender);
         return personMapper.toSenderResponse(updatedSender);
@@ -82,6 +83,7 @@ public class PersonService {
     // UPDATE RECIPIENT (FOR MANAGER/RECIPIENT)
     public RecipientResponse updateRecipient(String recipientId, UpdatePersonRequest request) {
         Recipient recipient = findRecipientById(recipientId);
+        validatePhoneAndEmailUpdate(request.getPhone(),request.getEmail(),recipient.getId());
         personMapper.updateRecipientFromRequest(request,recipient);
         Recipient updatedRecipient = personRepo.save(recipient);
         return personMapper.toRecipientResponse(updatedRecipient);
@@ -120,6 +122,15 @@ public class PersonService {
             throw new EmailAlreadyExistsException(email);
         }
         if(personRepo.existsByPhone(phone)){
+            throw new PhoneAlreadyExistsException(phone);
+        }
+    }
+    // VALIDATION FOR EXISTING PHONE OR EMAIL(PERSON CREATION CASE)
+    private void validatePhoneAndEmailUpdate(String phone,String email,UUID id){
+        if(personRepo.existsByEmailAndIdNot(email,id)){
+            throw new EmailAlreadyExistsException(email);
+        }
+        if(personRepo.existsByPhoneAndIdNot(phone,id)){
             throw new PhoneAlreadyExistsException(phone);
         }
     }

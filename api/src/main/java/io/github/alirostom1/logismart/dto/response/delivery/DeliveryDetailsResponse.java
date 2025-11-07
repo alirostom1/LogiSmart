@@ -1,5 +1,6 @@
 package io.github.alirostom1.logismart.dto.response.delivery;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.alirostom1.logismart.dto.response.client.RecipientResponse;
 import io.github.alirostom1.logismart.dto.response.client.SenderResponse;
 import io.github.alirostom1.logismart.dto.response.courier.CourierResponse;
@@ -18,6 +19,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DeliveryDetailsResponse {
     private String id;
     private String description;
@@ -27,10 +29,11 @@ public class DeliveryDetailsResponse {
     private String priority;
     private SenderResponse sender;
     private RecipientResponse recipient;
-    private CourierResponse assignedCourier;
+    private CourierResponse collectingCourier;
+    private CourierResponse shippingCourier;
     private ZoneResponse zone;
     private List<ProductInDeliveryResponse> products;
     private List<DeliveryHistoryResponse> history;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String createdAt;
+    private String updatedAt;
 }

@@ -43,28 +43,4 @@ public class SearchDeliveryRequest {
 
     @ValidUUID
     private String recipientId;
-
-    @Min(value = 0, message = "Page must be greater than or equal to 0")
-    private Integer page = 0;
-
-    @Min(value = 1, message = "Size must be greater than or equal to 1")
-    @Min(value = 100, message = "Size must be less than or equal to 100")
-    private Integer size = 20;
-
-    @Pattern(regexp = "^(createdAt|updatedAt|destinationCity|priority|status)$",
-            message = "Sort by must be one of: createdAt, updatedAt, destinationCity, priority, status")
-    private String sortBy = "createdAt";
-
-    @Pattern(regexp = "^(ASC|DESC)$",
-            message = "Sort direction must be ASC or DESC")
-    private String sortDirection = "DESC";
-
-    public Pageable getPageable() {
-        return PageRequest.of(
-                page != null ? page : 0,
-                size != null ? size : 20,
-                Sort.by(Sort.Direction.fromString(sortDirection != null ? sortDirection : "DESC"),
-                        sortBy != null ? sortBy : "createdAt")
-        );
-    }
 }

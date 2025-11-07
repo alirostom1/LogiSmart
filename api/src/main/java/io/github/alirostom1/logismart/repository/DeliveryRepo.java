@@ -13,5 +13,5 @@ import java.util.UUID;
 public interface DeliveryRepo extends JpaRepository<Delivery, UUID> , JpaSpecificationExecutor<Delivery> {
     Page<Delivery> findBySenderId(UUID senderId, Pageable pageable);
     Page<Delivery> findByRecipientId(UUID recipientId, Pageable pageable);
-    Page<Delivery> findByCourierId(UUID courierId, Pageable pageable);
+    Page<Delivery> findByCollectingCourierIdOrShippingCourierId(UUID collectId,UUID shippingId, Pageable pageable);
 }

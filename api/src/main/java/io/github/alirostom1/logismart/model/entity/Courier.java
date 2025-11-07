@@ -36,9 +36,14 @@ public class Courier{
     @Column(name = "phone_number",nullable = false,unique = true)
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "courier",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "collectingCourier", fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Delivery> deliveries;
+    private List<Delivery> collectingDeliveries;
+
+    @OneToMany(mappedBy = "shippingCourier", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Delivery> shippingDeliveries;
+    
 
     @ManyToOne
     @JoinColumn(name = "zone_id",nullable = false)

@@ -5,7 +5,6 @@ import io.github.alirostom1.logismart.dto.request.delivery.CreateDeliveryRequest
 import io.github.alirostom1.logismart.dto.response.delivery.DeliveryResponse;
 import io.github.alirostom1.logismart.dto.response.delivery.DeliveryDetailsResponse;
 import io.github.alirostom1.logismart.dto.response.delivery.DeliveryTrackingResponse;
-import io.github.alirostom1.logismart.mapper.courier.CourierSimpleMapperImpl;
 import io.github.alirostom1.logismart.model.entity.Delivery;
 import org.mapstruct.*;
 
@@ -20,13 +19,16 @@ public interface DeliveryMapper {
     @Mapping(target = "senderName",
             expression = "java(delivery.getSender().getFirstName() + \" \" + delivery.getSender().getLastName())")
     @Mapping(target = "zoneName", source = "zone.name")
-    @Mapping(target = "assignedCourierName",
-            expression = "java(delivery.getCourier() != null ? delivery.getCourier().getFirstName() + \" \" + delivery.getCourier().getLastName() : null)")
+    @Mapping(target = "collectingCourierName",
+            expression = "java(delivery.getCollectingCourier() != null ? delivery.getCollectingCourier().getFirstName() + \" \" + delivery.getCollectingCourier().getLastName() : null)")
+    @Mapping(target = "shippingCourierName",
+            expression = "java(delivery.getShippingCourier() != null ? delivery.getShippingCourier().getFirstName() + \" \" + delivery.getShippingCourier().getLastName() : null)")
     DeliveryResponse toResponse(Delivery delivery);
 
     @Mapping(target = "products", source = "deliveryProducts")
     @Mapping(target = "history", source = "deliveryHistoryList")
-    @Mapping(target = "assignedCourier", source = "courier")
+    @Mapping(target = "collectingCourier", source = "collectingCourier")
+    @Mapping(target = "shippingCourier", source = "shippingCourier")
     DeliveryDetailsResponse toDetailsResponse(Delivery delivery);
 
     @Mapping(target = "currentStatus", source = "status")
@@ -34,6 +36,10 @@ public interface DeliveryMapper {
             expression = "java(delivery.getRecipient().getFirstName() + \" \" + delivery.getRecipient().getLastName())")
     @Mapping(target = "senderName",
             expression = "java(delivery.getSender().getFirstName() + \" \" + delivery.getSender().getLastName())")
+    @Mapping(target = "collectingCourierName",
+            expression = "java(delivery.getCollectingCourier() != null ? delivery.getCollectingCourier().getFirstName() + \" \" + delivery.getCollectingCourier().getLastName() : null)")
+    @Mapping(target = "shippingCourierName",
+            expression = "java(delivery.getShippingCourier() != null ? delivery.getShippingCourier().getFirstName() + \" \" + delivery.getShippingCourier().getLastName() : null)")
     @Mapping(target = "lastUpdate", source = "updatedAt")
     DeliveryTrackingResponse toTrackingResponse(Delivery delivery);
 
@@ -48,7 +54,8 @@ public interface DeliveryMapper {
     @Mapping(target = "sender", ignore = true)
     @Mapping(target = "recipient", ignore = true)
     @Mapping(target = "zone", ignore = true)
-    @Mapping(target = "courier", ignore = true)
+    @Mapping(target = "collectingCourier", ignore = true)
+    @Mapping(target = "shippingCourier", ignore = true)
     @Mapping(target = "deliveryProducts", ignore = true)
     @Mapping(target = "deliveryHistoryList", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

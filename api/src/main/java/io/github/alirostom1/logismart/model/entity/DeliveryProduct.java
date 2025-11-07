@@ -16,7 +16,7 @@ public class DeliveryProduct{
     private DeliveryProductId id;
 
     @Column(nullable = false)
-    private int quanitity;
+    private int quantity;
 
     @Column(nullable = false)
     private double price;
