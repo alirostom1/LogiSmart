@@ -18,6 +18,5 @@ public class CreateZoneRequest {
 
     @NotNull(message = "Postal code is required")
     @Positive(message = "Postal code must be positive")
-    @Pattern(regexp = "^[0-9]$",message = "Postal code must be numeric")
-    private Integer postalCode;
+    private int postalCode;
 }
