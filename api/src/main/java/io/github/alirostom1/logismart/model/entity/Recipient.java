@@ -18,4 +18,9 @@ import java.util.UUID;
 public class Recipient extends Person{
     @OneToMany(mappedBy = "recipient", fetch = FetchType.EAGER)
     private List<Delivery> deliveries = new ArrayList<>();
+
+    public Recipient(UUID id, String lastName, String firstName, String email, String phone, String address, List<Delivery> deliveries) {
+        super(id, lastName, firstName, email, phone, address);
+        this.deliveries = deliveries;
+    }
 }
