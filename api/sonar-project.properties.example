@@ -1,0 +1,6 @@
+sonar.projectKey=
+sonar.projectName=
+sonar.host.url=http://localhost:9000
+sonar.sources=src/main/java
+sonar.java.binaries=target/classes
+sonar.login=
