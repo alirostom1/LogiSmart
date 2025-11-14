@@ -131,3 +131,30 @@ Spring-based REST API for managing couriers, deliveries, senders, recipients, pr
 Visit [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html) for complete interactive docs.
 
 ---
+## Test Coverage & Code Quality
+
+### JaCoCo Code Coverage
+
+After running your tests with Maven, a JaCoCo coverage report is generated at `target/site/jacoco/index.html`.
+
+![JaCoCo Coverage](https://github.com/alirostom1/LogiSmart/blob/tests/docs/Jacoco.png)
+
+---
+
+### SonarQube Analysis
+
+SonarQube checks static code quality and technical debt.
+
+![SonarQube Coverage](https://github.com/alirostom1/LogiSmart/blob/tests/docs/Jacoco.png)
+
+To run SonarQube locally:
+
+1. Copy the SonarQube properties file:
+
+   cp sonar-project.properties.example sonar-project.properties
+
+2. Run the SonarQube scanner (ensure your SonarQube instance is running):
+
+   sonar-scanner
+
+This will analyze your project and you can view the results on your SonarQube dashboard.
