@@ -11,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,11 +39,11 @@ public class Courier{
 
     @OneToMany(mappedBy = "collectingCourier", fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Delivery> collectingDeliveries;
+    private List<Delivery> collectingDeliveries = new ArrayList<>();
 
     @OneToMany(mappedBy = "shippingCourier", fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Delivery> shippingDeliveries;
+    private List<Delivery> shippingDeliveries = new ArrayList<>();
     
 
     @ManyToOne

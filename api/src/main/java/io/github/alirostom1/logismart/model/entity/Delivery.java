@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -72,7 +73,7 @@ public class Delivery {
     private Courier shippingCourier;
 
     @OneToMany(mappedBy = "delivery",fetch = FetchType.EAGER)
-    private List<DeliveryHistory> deliveryHistoryList;
+    private List<DeliveryHistory> deliveryHistoryList = new ArrayList<>();
 
 
     @PrePersist

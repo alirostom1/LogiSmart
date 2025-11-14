@@ -41,4 +41,7 @@ build/
 tomcat.8080/
 
 .env
-logs/service-aspect.log
+logs/*
+sonar-project.properties
+.sonar_lock
+.scannerwork
