@@ -145,7 +145,7 @@ After running your tests with Maven, a JaCoCo coverage report is generated at `t
 
 SonarQube checks static code quality and technical debt.
 
-![SonarQube Coverage](https://github.com/alirostom1/LogiSmart/blob/tests/docs/Jacoco.png)
+![SonarQube Coverage](https://github.com/alirostom1/LogiSmart/blob/tests/docs/sonarQube.png)
 
 To run SonarQube locally:
 
