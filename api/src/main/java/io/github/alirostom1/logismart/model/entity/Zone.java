@@ -2,6 +2,7 @@ package io.github.alirostom1.logismart.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 import java.util.UUID;
@@ -10,8 +11,9 @@ import java.util.UUID;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 @Table(name = "zones")
-public class Zone {
+public class Zone extends AbstractAuditableEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

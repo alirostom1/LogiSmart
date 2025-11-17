@@ -59,7 +59,7 @@ public class ProductServiceUnitTest {
     @Test
     public void updateProduct_should_return_product(){
         UUID id = UUID.randomUUID();
-        Product mockProduct = new Product(id,"product1","category1",15.0,null);
+        Product mockProduct = Product.builder().id(id).name("product1").category("category1").unitPrice(15.0).deliveryProduct(null).build();
         CreateProductRequest request = new CreateProductRequest("product2","category2",30.0);
         productMapper.updateFromRequest(request,mockProduct);
         ProductResponse mockProductResponse = productMapper.toResponse(mockProduct);
@@ -92,7 +92,7 @@ public class ProductServiceUnitTest {
     @Test
     public void getProductById_should_return_product(){
         UUID id = UUID.randomUUID();
-        Product mockProduct = new Product(id,"product1","category1",30.0,null);
+        Product mockProduct = Product.builder().id(id).name("product1").category("category1").unitPrice(15.0).deliveryProduct(null).build();
         ProductResponse mockResponse = productMapper.toResponse(mockProduct);
         when(productRepo.findById(id)).thenReturn(Optional.of(mockProduct));
         ProductResponse productResponse = productService.getProductById(id.toString());
@@ -109,8 +109,8 @@ public class ProductServiceUnitTest {
     //PRODUCTS RETRIEVAL
     @Test
     public void getAllProducts_should_return_products(){
-        Product mockProduct1 = new Product(UUID.randomUUID(),"Product1","Category1",30.0,null);
-        Product mockProduct2 = new Product(UUID.randomUUID(),"Product2","Category2",45.0,null);
+        Product mockProduct1 = Product.builder().id(UUID.randomUUID()).name("product1").category("category1").unitPrice(15.0).deliveryProduct(null).build();
+        Product mockProduct2 = Product.builder().id(UUID.randomUUID()).name("product2").category("category2").unitPrice(30.0).deliveryProduct(null).build();
         Pageable pageRequest = PageRequest.of(0,10);
         Page<Product> mockProductPage = new PageImpl<>(
                 List.of(mockProduct1,mockProduct2)
@@ -126,8 +126,8 @@ public class ProductServiceUnitTest {
     @Test
     public void searchProducts_should_return_products(){
         String searchTerm = "Product 2";
-        Product mockProduct1 = new Product(UUID.randomUUID(),"Product1","Category1",30.0,null);
-        Product mockProduct2 = new Product(UUID.randomUUID(),"Product2","Category2",45.0,null);
+        Product mockProduct1 = Product.builder().id(UUID.randomUUID()).name("product1").category("category1").unitPrice(15.0).deliveryProduct(null).build();
+        Product mockProduct2 = Product.builder().id(UUID.randomUUID()).name("product2").category("category2").unitPrice(30.0).deliveryProduct(null).build();
         Pageable pageRequest = PageRequest.of(0,10);
         Page<Product> mockProductPage = new PageImpl<>(
                 List.of(mockProduct1),
@@ -142,8 +142,8 @@ public class ProductServiceUnitTest {
     @Test
     public void getProductsByCategory_should_return_products() {
         String category = "Category1";
-        Product mockProduct1 = new Product(UUID.randomUUID(), "Product1", category, 30.0, null);
-        Product mockProduct2 = new Product(UUID.randomUUID(), "Product2", category, 45.0, null);
+        Product mockProduct1 = Product.builder().id(UUID.randomUUID()).name("product1").category("category1").unitPrice(15.0).deliveryProduct(null).build();
+        Product mockProduct2 = Product.builder().id(UUID.randomUUID()).name("product2").category("category2").unitPrice(30.0).deliveryProduct(null).build();
 
         Pageable pageRequest = PageRequest.of(0, 10);
         Page<Product> mockProductPage = new PageImpl<>(

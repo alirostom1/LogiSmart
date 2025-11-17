@@ -20,7 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/v2/products")
+@RequestMapping("api/v3/products")
 @Tag(name = "Product API", description = "Operations for products")
 @RequiredArgsConstructor
 public class ProductController {

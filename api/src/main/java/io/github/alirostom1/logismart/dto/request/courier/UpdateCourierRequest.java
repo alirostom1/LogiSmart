@@ -3,6 +3,7 @@ package io.github.alirostom1.logismart.dto.request.courier;
 import io.github.alirostom1.logismart.util.ValidUUID;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,9 @@ public class UpdateCourierRequest {
 
     @NotBlank(message = "Vehicle is required")
     private String vehicle;
+
+    @NotBlank(message = "Email is required")
+    private String email;
 
     @NotBlank(message = "Phone number is required")
     private String phoneNumber;

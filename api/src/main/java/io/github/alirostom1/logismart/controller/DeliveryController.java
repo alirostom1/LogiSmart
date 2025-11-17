@@ -24,7 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/v2/deliveries")
+@RequestMapping("api/v3/deliveries")
 @Tag(name = "Delivery API", description = "Operations related to deliveries")
 @RequiredArgsConstructor
 public class DeliveryController {

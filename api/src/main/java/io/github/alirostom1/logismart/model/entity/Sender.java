@@ -15,13 +15,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter @Setter
-@DiscriminatorValue(value = "sender")
+@DiscriminatorValue(value = "senders")
+@SuperBuilder
 public class Sender extends Person {
     @OneToMany(mappedBy = "sender",fetch = FetchType.EAGER)
     private List<Delivery> deliveries = new ArrayList<>();
-
-    public Sender(UUID id, String lastName, String firstName, String email, String phone, String address, List<Delivery> deliveries) {
-        super(id, lastName, firstName, email, phone, address);
-        this.deliveries = deliveries;
-    }
 }

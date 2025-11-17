@@ -1,8 +1,6 @@
 package io.github.alirostom1.logismart.repository;
 
-import io.github.alirostom1.logismart.model.entity.Person;
-import io.github.alirostom1.logismart.model.entity.Recipient;
-import io.github.alirostom1.logismart.model.entity.Sender;
+import io.github.alirostom1.logismart.model.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,10 +23,34 @@ public interface PersonRepo extends JpaRepository<Person, UUID> {
     @Query("SELECT p FROM Person p WHERE p.id = :id AND TYPE(p) = Recipient")
     Optional<Recipient> findRecipientById(@Param("id") UUID id);
 
+
+    @Query("SELECT p FROM Person p WHERE p.id = :id AND TYPE(p) = Manager ")
+    Optional<Manager> findManagerById(@Param("id") UUID id);
+
     @Query("SELECT p FROM Person p WHERE TYPE(p) = Sender")
     Page<Sender> findSenders(Pageable pageable);
 
     @Query("SELECT p FROM Person p WHERE TYPE(p) = Recipient")
     Page<Recipient> findRecipients(Pageable pageable);
+
+
+    //COURIER
+    @Query("SELECT c FROM Courier c WHERE c.id = :id")
+    Optional<Courier> findCourierById(UUID id);
+
+    @Query("SELECT c FROM Courier c")
+    Page<Courier> findAllCouriers(Pageable pageable);
+
+    @Query("SELECT c FROM Courier c WHERE c.zone.id = :zoneId")
+    Page<Courier> findCouriersByZoneId(UUID zoneId, Pageable pageable);
+
+    @Query("SELECT COUNT(p) > 0 FROM Person p WHERE p.phone = :phone AND TYPE(p) = Courier")
+    boolean existsByPhoneAndTypeCourier(String phone);
+
+    @Query("SELECT COUNT(p) > 0 FROM Person p WHERE p.phone = :phone AND TYPE(p) = Courier AND p.id != :id")
+    boolean existsByPhoneAndTypeCourierAndIdNot(String phone, UUID id);
+
+    @Query("SELECT COUNT(p) > 0 FROM Person p WHERE p.id = :id AND TYPE(p) = Courier")
+    boolean existsByIdAndTypeCourier(UUID id);
 
 }

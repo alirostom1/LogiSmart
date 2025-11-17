@@ -22,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/v2/persons")
+@RequestMapping("api/v3/persons")
 @Tag(name = "Person API", description = "Operations for senders and recipients")
 @RequiredArgsConstructor
 public class PersonController {

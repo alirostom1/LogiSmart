@@ -6,6 +6,7 @@ import io.github.alirostom1.logismart.model.enums.DeliveryPriority;
 import io.github.alirostom1.logismart.model.enums.DeliveryStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -18,12 +19,9 @@ import java.util.UUID;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 @Table(name = "deliveries")
-public class Delivery {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
+public class Delivery extends AbstractAuditableEntity{
     @Column(columnDefinition = "TEXT")
     private String description;
 
@@ -56,13 +54,6 @@ public class Delivery {
     private List<DeliveryProduct> deliveryProducts;
 
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "collecting_courier_id")
@@ -74,16 +65,4 @@ public class Delivery {
 
     @OneToMany(mappedBy = "delivery",fetch = FetchType.EAGER)
     private List<DeliveryHistory> deliveryHistoryList = new ArrayList<>();
-
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 }

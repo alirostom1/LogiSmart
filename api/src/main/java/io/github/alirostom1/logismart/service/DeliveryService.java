@@ -33,7 +33,6 @@ public class DeliveryService {
     private final PersonRepo personRepo;
     private final ZoneRepo zoneRepo;
     private final DeliveryHistoryRepo deliveryHistoryRepo;
-    private final CourierRepo courierRepo;
     private final ProductRepo productRepo;
     private final DeliveryProductRepo deliveryProductRepo;
 
@@ -110,7 +109,7 @@ public class DeliveryService {
     public DeliveryDetailsResponse assignCollectingCourier(String deliveryId,
                                                    AssignDeliveryRequest request){
         Delivery delivery = findById(deliveryId);
-        Courier courier = courierRepo.findById(UUID.fromString(request.getCourierId()))
+        Courier courier = personRepo.findCourierById(UUID.fromString(request.getCourierId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Courier",request.getCourierId()));
         delivery.setCollectingCourier(courier);
         Delivery savedDelivery = deliveryRepo.save(delivery);
@@ -122,7 +121,7 @@ public class DeliveryService {
     public DeliveryDetailsResponse assignShippingCourier(String deliveryId,
                                                            AssignDeliveryRequest request){
         Delivery delivery = findById(deliveryId);
-        Courier courier = courierRepo.findById(UUID.fromString(request.getCourierId()))
+        Courier courier = personRepo.findCourierById(UUID.fromString(request.getCourierId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Courier",request.getCourierId()));
         delivery.setShippingCourier(courier);
         Delivery savedDelivery = deliveryRepo.save(delivery);
