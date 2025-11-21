@@ -7,7 +7,9 @@ import io.github.alirostom1.logismart.dto.request.delivery.UpdateDeliveryStatusR
 import io.github.alirostom1.logismart.dto.response.delivery.DeliveryDetailsResponse;
 import io.github.alirostom1.logismart.dto.response.delivery.DeliveryResponse;
 import io.github.alirostom1.logismart.dto.response.delivery.DeliveryTrackingResponse;
+import io.github.alirostom1.logismart.exception.DeliveryCourierZoneMismatchException;
 import io.github.alirostom1.logismart.exception.ResourceNotFoundException;
+import io.github.alirostom1.logismart.exception.ZoneNotServicedException;
 import io.github.alirostom1.logismart.mapper.DeliveryMapper;
 import io.github.alirostom1.logismart.model.entity.*;
 import io.github.alirostom1.logismart.model.enums.DeliveryStatus;
@@ -20,6 +22,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -30,38 +33,39 @@ import java.util.UUID;
 public class DeliveryService {
     private final DeliveryRepo deliveryRepo;
     private final DeliveryMapper deliveryMapper;
-    private final PersonRepo personRepo;
-    private final ZoneRepo zoneRepo;
+    private final SenderRepo senderRepo;
+    private final ZonePostalCodeRepo zonePostalCodeRepo;
+    private final ZoneService zoneService;
     private final DeliveryHistoryRepo deliveryHistoryRepo;
     private final ProductRepo productRepo;
     private final DeliveryProductRepo deliveryProductRepo;
+    private final RecipientService recipientService;
+    private final CourierRepo courierRepo;
 
 
     //CREATE DELIVERY(FOR SENDER)
 
-    public DeliveryDetailsResponse createDelivery(CreateDeliveryRequest request) {
+    public DeliveryDetailsResponse createDelivery(CreateDeliveryRequest request,Long senderId) {
         //GET SENDER AND RECIPIENT
-        Person senderPerson = personRepo.findById(UUID.fromString(request.getSenderId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Sender",request.getSenderId()));
-        Person recipientPerson = personRepo.findById(UUID.fromString(request.getRecipientId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Recipient",request.getRecipientId()));
-        if(!(senderPerson instanceof Sender)){
-            throw new ResourceNotFoundException("Sender",request.getSenderId());
-        }
-        if(!(recipientPerson instanceof Recipient)){
-            throw new ResourceNotFoundException("Recipient",request.getRecipientId());
-        }
-        Sender sender = (Sender) senderPerson;
-        Recipient recipient = (Recipient) recipientPerson;
+        Sender sender = senderRepo.findById(senderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Sender not found"));
+        Recipient recipient = recipientService.findOrCreateRecipient(request.getRecipientData());
 
         //GET ZONE
-        Zone zone = zoneRepo.findById(UUID.fromString(request.getZoneId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Zone", request.getZoneId()));
+        Zone pickupZone = zonePostalCodeRepo.findZoneByPostalCode(request.getPickupPostalCode())
+                .orElseThrow(() -> new ZoneNotServicedException("Pickup zone not available"));
+        Zone shippingZone = zonePostalCodeRepo.findZoneByPostalCode(request.getShippingPostalCode())
+                .orElseThrow(() -> new ZoneNotServicedException("Shipping zone not available"));
+
+        //VALIDATE IF BOTH ZONES ARE ACTIVE
+        zoneService.validateDeliveryZones(pickupZone,shippingZone);
+
         //ATTACH DELIVERY RELATIONSHIPS
         Delivery delivery = deliveryMapper.toEntity(request);
         delivery.setSender(sender);
         delivery.setRecipient(recipient);
-        delivery.setZone(zone);
+        delivery.setPickupZone(pickupZone);
+        delivery.setShippingZone(shippingZone);
 
         //SAVE DELIVERY
         Delivery savedDelivery = deliveryRepo.save(delivery);
@@ -79,22 +83,23 @@ public class DeliveryService {
     }
 
 
-    // RETRIEVE SPECIFIC DELIVERY (FOR MANAGER).toString()
+    // RETRIEVE SPECIFIC DELIVERY (FOR MANAGER)
     @Transactional(readOnly = true)
-    public DeliveryDetailsResponse getDeliveryById(String deliveryId){
+    public DeliveryDetailsResponse getDeliveryById(Long deliveryId){
         Delivery delivery = findById(deliveryId);
         return deliveryMapper.toDetailsResponse(delivery);
     }
 
     //TRACK SPECIFIC DELIVERY (FOR SENDER AND RECIPIENT)
     @Transactional(readOnly = true)
-    public DeliveryTrackingResponse getDeliveryTracking(String deliveryId) {
-        Delivery delivery = findById(deliveryId);
+    public DeliveryTrackingResponse getDeliveryTracking(String trackingNumber) {
+        Delivery delivery = deliveryRepo.findByTrackingNumber(trackingNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Delivery not found"));
         return deliveryMapper.toTrackingResponse(delivery);
     }
 
     //UPDATE DELIVERY STATUS(FOR ALL ACTORS)
-    public DeliveryDetailsResponse updateDeliveryStatus(String deliveryId,
+    public DeliveryDetailsResponse updateDeliveryStatus(Long deliveryId,
                                                         UpdateDeliveryStatusRequest request){
         Delivery delivery = findById(deliveryId);
         DeliveryStatus status = DeliveryStatus.valueOf(request.getStatus());
@@ -106,11 +111,14 @@ public class DeliveryService {
     }
 
     //ASSIGN COURIER TO A COLLECT DELIVERY AFTER CREATION (FOR MANAGER)
-    public DeliveryDetailsResponse assignCollectingCourier(String deliveryId,
+    public DeliveryDetailsResponse assignCollectingCourier(Long deliveryId,
                                                    AssignDeliveryRequest request){
         Delivery delivery = findById(deliveryId);
-        Courier courier = personRepo.findCourierById(UUID.fromString(request.getCourierId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Courier",request.getCourierId()));
+        Courier courier = courierRepo.findById(request.getCourierId())
+                .orElseThrow(() -> new ResourceNotFoundException("Courier not found"));
+        if(delivery.getPickupZone().getId().equals(courier.getZone().getId())){
+            throw new DeliveryCourierZoneMismatchException("Collecting courier isn't available for this specific pickup zone!");
+        }
         delivery.setCollectingCourier(courier);
         Delivery savedDelivery = deliveryRepo.save(delivery);
         saveToHistory(savedDelivery,delivery.getStatus(),"Collection Assigned to courier " +
@@ -118,11 +126,14 @@ public class DeliveryService {
         return deliveryMapper.toDetailsResponse(savedDelivery);
     }
     //ASSIGN COURIER TO A SHIP DELIVERY AFTER CREATION (FOR MANAGER)
-    public DeliveryDetailsResponse assignShippingCourier(String deliveryId,
+    public DeliveryDetailsResponse assignShippingCourier(Long deliveryId,
                                                            AssignDeliveryRequest request){
         Delivery delivery = findById(deliveryId);
-        Courier courier = personRepo.findCourierById(UUID.fromString(request.getCourierId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Courier",request.getCourierId()));
+        Courier courier = courierRepo.findById(request.getCourierId())
+                .orElseThrow(() -> new ResourceNotFoundException("Courier not found"));
+        if(delivery.getPickupZone().getId().equals(courier.getZone().getId())){
+            throw new DeliveryCourierZoneMismatchException("Shipping courier isn't available for this specific shipping zone!");
+        }
         delivery.setShippingCourier(courier);
         Delivery savedDelivery = deliveryRepo.save(delivery);
         saveToHistory(savedDelivery,delivery.getStatus(),"Shipping Assigned to courier " +
@@ -140,31 +151,30 @@ public class DeliveryService {
 
     //GET SENDER'S DELIVERIES(FOR SENDER)
     @Transactional(readOnly = true)
-    public Page<DeliveryResponse> getDeliveriesBySender(String senderId, Pageable pageable){
-        Page<Delivery> deliveries = deliveryRepo.findBySenderId(UUID.fromString(senderId),pageable);
+    public Page<DeliveryResponse> getDeliveriesBySender(Long senderId, Pageable pageable){
+        Page<Delivery> deliveries = deliveryRepo.findBySenderId(senderId,pageable);
         return deliveries.map(deliveryMapper::toResponse);
     }
     //GET RECIPIENT'S DELIVERIES(FOR RECIPIENT)
     @Transactional(readOnly = true)
-    public Page<DeliveryResponse> getDeliveriesByRecipient(String recipientId, Pageable pageable){
-        Page<Delivery> deliveries = deliveryRepo.findByRecipientId(UUID.fromString(recipientId),pageable);
+    public Page<DeliveryResponse> getDeliveriesByRecipient(String phone, Pageable pageable){
+        Page<Delivery> deliveries = deliveryRepo.findByRecipientPhone(phone,pageable);
         return deliveries.map(deliveryMapper::toResponse);
     }
     //GET COURIER'S DELIVERIES(FOR COURIER)
     @Transactional(readOnly = true)
-    public Page<DeliveryResponse> getDeliveriesByCourier(String courierId, Pageable pageable){
-        UUID id = UUID.fromString(courierId);
-        Page<Delivery> deliveries = deliveryRepo.findByCollectingCourierIdOrShippingCourierId(id,id,pageable);
+    public Page<DeliveryResponse> getDeliveriesByCourier(Long courierId, Pageable pageable){
+        Page<Delivery> deliveries = deliveryRepo.findByCollectingCourierIdOrShippingCourierId(courierId,courierId,pageable);
         return deliveries.map(deliveryMapper::toResponse);
     }
 
     //DELETE DELIVERY (FOR MANAGER)
-    public void deleteDelivery(String deliveryId){
+    public void deleteDelivery(Long deliveryId){
         Delivery delivery = findById(deliveryId);
         if(delivery.getStatus() != DeliveryStatus.DELIVERED && delivery.getStatus() != DeliveryStatus.CREATED){
             throw new RuntimeException("Couldn't delete a undelievered delivery!");
         }
-        deliveryRepo.deleteById(UUID.fromString(deliveryId));
+        deliveryRepo.deleteById(deliveryId);
     }
 
 
@@ -179,9 +189,9 @@ public class DeliveryService {
         return deliveryHistoryRepo.save(history);
     }
     // FIND DELIVERY BY ID AND THROW EXCEPTION IF NOT FOUND
-    private Delivery findById(String deliveryId){
-        return deliveryRepo.findById(UUID.fromString(deliveryId))
-                .orElseThrow(() -> new ResourceNotFoundException("Delivery",deliveryId));
+    private Delivery findById(Long deliveryId){
+        return deliveryRepo.findById(deliveryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Delivery not found"));
     }
     // BUILD SEARCH AND FILTER SPECIFICATION
     private Specification<Delivery> buildSearchSpecification(SearchDeliveryRequest request){
@@ -189,11 +199,9 @@ public class DeliveryService {
                 DeliverySpecification.hasSearchTerm(request.getSearchTerm()),
                 DeliverySpecification.hasStatus(request.getStatus()),
                 DeliverySpecification.hasPriority(request.getPriority()),
-                DeliverySpecification.hasZoneId(request.getZoneId()),
-                DeliverySpecification.hasCity(request.getCity()),
-                DeliverySpecification.hasCourierId(request.getCourierId()),
-                DeliverySpecification.hasSenderId(request.getSenderId()),
-                DeliverySpecification.hasRecipientId(request.getRecipientId())
+                DeliverySpecification.hasPickupZone(request.getPickupZoneId()),
+                DeliverySpecification.hasDeliveryZone(request.getDeliveryZoneId())
+
         );
     }
     //SAVE LIST OF PRODUCTS TO DELIVERY
@@ -201,12 +209,11 @@ public class DeliveryService {
                                                          List<CreateDeliveryRequest.DeliveryProductRequest> productRequests){
         List<DeliveryProduct> deliveryProducts = new ArrayList<>();
         for(CreateDeliveryRequest.DeliveryProductRequest productRequest : productRequests){
-            Product product = productRepo.findById(UUID.fromString(productRequest.getProductId()))
-                    .orElseThrow(() -> new ResourceNotFoundException("Product",productRequest.getProductId()));
-            double totalPrice = product.getUnitPrice() * productRequest.getQuantity();
+            Product product = productRepo.findById(productRequest.getProductId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+            BigDecimal totalPrice = product.getUnitPrice().multiply(BigDecimal.valueOf(productRequest.getQuantity()));
             DeliveryProduct deliveryProduct = new DeliveryProduct();
-            deliveryProduct.setId(new DeliveryProductId(product.getId(),delivery.getId()));
-            deliveryProduct.setPrice(totalPrice);
+            deliveryProduct.setPriceAtOrder(totalPrice);
             deliveryProduct.setQuantity(productRequest.getQuantity());
             deliveryProduct.setDelivery(delivery);
             deliveryProduct.setProduct(product);

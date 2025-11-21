@@ -9,12 +9,22 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@DiscriminatorValue(value = "recipient")
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class Recipient extends Person{
+@Table(name = "recipients",uniqueConstraints = @UniqueConstraint(columnNames = {"phone", "postal_code"}))
+public class Recipient extends AbstractAuditableEntity{
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false,unique = true)
+    private String phone;
+
+    @Column(nullable = false,unique = true)
+    private String email;
+
     @OneToMany(mappedBy = "recipient", fetch = FetchType.EAGER)
     private List<Delivery> deliveries = new ArrayList<>();
 }

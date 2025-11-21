@@ -1,0 +1,741 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1763635018021-1
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_courier
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: vehicle
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: assigned_zone_id
+                  type: BIGINT
+            tableName: courier
+  - changeSet:
+      id: 1763635018021-2
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_deliveries
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  name: modified_by
+                  type: VARCHAR(255)
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: tracking_number
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: weight_kg
+                  type: DECIMAL(10, 3)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: status
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: priority
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: recipient_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: sender_id
+                  type: BIGINT
+              - column:
+                  name: collecting_courier_id
+                  type: BIGINT
+              - column:
+                  name: shipping_courier_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: pickup_zone_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: shipping_zone_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: pickup_address
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: pickup_postal_code
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: shipping_address
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: shipping_postal_code
+                  type: VARCHAR(255)
+            tableName: deliveries
+  - changeSet:
+      id: 1763635018021-3
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_deliveryhistory
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  name: modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: status
+                  type: VARCHAR(255)
+              - column:
+                  name: comment
+                  type: TEXT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: delivery_id
+                  type: BIGINT
+            tableName: delivery_history
+  - changeSet:
+      id: 1763635018021-4
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_delivery_products
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  name: modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: delivery_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: product_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: quantity
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: price_at_order
+                  type: DECIMAL(12, 2)
+            tableName: delivery_products
+  - changeSet:
+      id: 1763635018021-5
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_manager
+                  name: id
+                  type: BIGINT
+            tableName: manager
+  - changeSet:
+      id: 1763635018021-6
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_products
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  name: modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(100)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: slug
+                  type: VARCHAR(255)
+              - column:
+                  name: category
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: unit_price
+                  type: DECIMAL(12, 2)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: sender_id
+                  type: BIGINT
+            tableName: products
+  - changeSet:
+      id: 1763635018021-7
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_recipients
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  name: modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: phone
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: email
+                  type: VARCHAR(255)
+            tableName: recipients
+  - changeSet:
+      id: 1763635018021-8
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_sender
+                  name: id
+                  type: BIGINT
+            tableName: sender
+  - changeSet:
+      id: 1763635018021-9
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_users
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  name: modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: first_name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: password_hash
+                  type: TEXT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: phone
+                  type: VARCHAR(255)
+              - column:
+                  name: type
+                  type: VARCHAR(255)
+            tableName: users
+  - changeSet:
+      id: 1763635018021-10
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_zone_postal_codes
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  name: modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: zone_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: postal_code
+                  type: VARCHAR(255)
+            tableName: zone_postal_codes
+  - changeSet:
+      id: 1763635018021-11
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_zones
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  name: modified_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: code
+                  type: VARCHAR(10)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: active
+                  type: BOOLEAN
+            tableName: zones
+  - changeSet:
+      id: 1763635018021-12
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: phone
+            constraintName: uc_1c3730bba5be7a0050874e8cb
+            tableName: recipients
+  - changeSet:
+      id: 1763635018021-13
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: delivery_id, product_id
+            constraintName: uc_aa00d33ab67ee1cf1786596ca
+            tableName: delivery_products
+  - changeSet:
+      id: 1763635018021-14
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: tracking_number
+            constraintName: uc_deliveries_tracking_number
+            tableName: deliveries
+  - changeSet:
+      id: 1763635018021-15
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: postal_code
+            constraintName: uc_e5577d79e9d83423ac973ef43
+            tableName: zone_postal_codes
+  - changeSet:
+      id: 1763635018021-16
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: name
+            constraintName: uc_products_name
+            tableName: products
+  - changeSet:
+      id: 1763635018021-17
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: slug
+            constraintName: uc_products_slug
+            tableName: products
+  - changeSet:
+      id: 1763635018021-18
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: email
+            constraintName: uc_recipients_email
+            tableName: recipients
+  - changeSet:
+      id: 1763635018021-19
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: email
+            constraintName: uc_users_email
+            tableName: users
+  - changeSet:
+      id: 1763635018021-20
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: assigned_zone_id
+            baseTableName: courier
+            constraintName: FK_COURIER_ON_ASSIGNED_ZONE
+            referencedColumnNames: id
+            referencedTableName: zones
+  - changeSet:
+      id: 1763635018021-21
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: id
+            baseTableName: courier
+            constraintName: FK_COURIER_ON_ID
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 1763635018021-22
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: collecting_courier_id
+            baseTableName: deliveries
+            constraintName: FK_DELIVERIES_ON_COLLECTING_COURIER
+            referencedColumnNames: id
+            referencedTableName: courier
+  - changeSet:
+      id: 1763635018021-23
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: pickup_zone_id
+            baseTableName: deliveries
+            constraintName: FK_DELIVERIES_ON_PICKUP_ZONE
+            referencedColumnNames: id
+            referencedTableName: zones
+  - changeSet:
+      id: 1763635018021-24
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: recipient_id
+            baseTableName: deliveries
+            constraintName: FK_DELIVERIES_ON_RECIPIENT
+            referencedColumnNames: id
+            referencedTableName: recipients
+  - changeSet:
+      id: 1763635018021-25
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: sender_id
+            baseTableName: deliveries
+            constraintName: FK_DELIVERIES_ON_SENDER
+            referencedColumnNames: id
+            referencedTableName: sender
+  - changeSet:
+      id: 1763635018021-26
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: shipping_courier_id
+            baseTableName: deliveries
+            constraintName: FK_DELIVERIES_ON_SHIPPING_COURIER
+            referencedColumnNames: id
+            referencedTableName: courier
+  - changeSet:
+      id: 1763635018021-27
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: shipping_zone_id
+            baseTableName: deliveries
+            constraintName: FK_DELIVERIES_ON_SHIPPING_ZONE
+            referencedColumnNames: id
+            referencedTableName: zones
+  - changeSet:
+      id: 1763635018021-28
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: delivery_id
+            baseTableName: delivery_history
+            constraintName: FK_DELIVERYHISTORY_ON_DELIVERY
+            referencedColumnNames: id
+            referencedTableName: deliveries
+  - changeSet:
+      id: 1763635018021-29
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: delivery_id
+            baseTableName: delivery_products
+            constraintName: FK_DELIVERY_PRODUCTS_ON_DELIVERY
+            referencedColumnNames: id
+            referencedTableName: deliveries
+  - changeSet:
+      id: 1763635018021-30
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: product_id
+            baseTableName: delivery_products
+            constraintName: FK_DELIVERY_PRODUCTS_ON_PRODUCT
+            referencedColumnNames: id
+            referencedTableName: products
+  - changeSet:
+      id: 1763635018021-31
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: id
+            baseTableName: manager
+            constraintName: FK_MANAGER_ON_ID
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 1763635018021-32
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: sender_id
+            baseTableName: products
+            constraintName: FK_PRODUCTS_ON_SENDER
+            referencedColumnNames: id
+            referencedTableName: sender
+  - changeSet:
+      id: 1763635018021-33
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: id
+            baseTableName: sender
+            constraintName: FK_SENDER_ON_ID
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 1763635018021-34
+      author: ali-rostom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: zone_id
+            baseTableName: zone_postal_codes
+            constraintName: FK_ZONE_POSTAL_CODES_ON_ZONE
+            referencedColumnNames: id
+            referencedTableName: zones
+

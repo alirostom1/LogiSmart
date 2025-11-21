@@ -7,6 +7,7 @@ import io.github.alirostom1.logismart.dto.response.client.SenderResponse;
 import io.github.alirostom1.logismart.dto.response.common.PersonResponse;
 import io.github.alirostom1.logismart.model.entity.Sender;
 import io.github.alirostom1.logismart.model.entity.Recipient;
+import io.github.alirostom1.logismart.model.entity.User;
 import org.mapstruct.*;
 
 import java.util.List;
@@ -14,8 +15,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface PersonMapper {
     // RESPONSE MAPPING
-    PersonResponse toResponse(Sender sender);
-    PersonResponse toResponse(Recipient recipient);
+    PersonResponse toResponse(User user);
 
     @Mapping(target = "totalDeliveriesSent", expression = "java(sender.getDeliveries().size())")
     @Mapping(target = "activeDeliveries", expression = "java((int) sender.getDeliveries().stream().filter(d -> d.getStatus() != io.github.alirostom1.logismart.model.enums.DeliveryStatus.DELIVERED).count())")

@@ -28,11 +28,6 @@ public class CourierController {
 
     private final CourierService courierService;
 
-    @Operation(summary = "Create a new courier")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Courier created"),
-            @ApiResponse(responseCode = "400", description = "Invalid input")
-    })
     @PostMapping
     public ResponseEntity<DefaultApiResponse<CourierResponse>> createCourier(@Valid @RequestBody CreateCourierRequest request) {
         CourierResponse response = courierService.createCourier(request);
@@ -52,7 +47,7 @@ public class CourierController {
     })
     @GetMapping("/{courierId}")
     public ResponseEntity<DefaultApiResponse<CourierResponse>> getCourierById(
-            @Parameter(description = "Courier ID") @PathVariable String courierId) {
+            @PathVariable Long courierId) {
         CourierResponse response = courierService.getCourierById(courierId);
         DefaultApiResponse<CourierResponse> defaultApiResponse = new DefaultApiResponse<>(
                 true,
@@ -67,7 +62,7 @@ public class CourierController {
     @ApiResponse(responseCode = "200", description = "Courier and deliveries retrieved successfully")
     @GetMapping("/{courierId}/with-deliveries")
     public ResponseEntity<DefaultApiResponse<CourierWithDeliveriesResponse>> getCourierWithDeliveries(
-            @Parameter(description = "Courier ID") @PathVariable String courierId) {
+            @PathVariable Long courierId) {
         CourierWithDeliveriesResponse response = courierService.getCourierWithDeliveries(courierId);
         DefaultApiResponse<CourierWithDeliveriesResponse> defaultApiResponse = new DefaultApiResponse<>(
                 true,
@@ -78,14 +73,10 @@ public class CourierController {
         return ResponseEntity.ok(defaultApiResponse);
     }
 
-    @Operation(summary = "Update courier information")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Courier updated successfully"),
-            @ApiResponse(responseCode = "404", description = "Courier not found")
-    })
+
     @PutMapping("/{courierId}")
     public ResponseEntity<DefaultApiResponse<CourierResponse>> updateCourier(
-            @Parameter(description = "Courier ID") @PathVariable String courierId,
+            @PathVariable Long courierId,
             @Valid @RequestBody UpdateCourierRequest request) {
         CourierResponse response = courierService.updateCourier(courierId, request);
         DefaultApiResponse<CourierResponse> defaultApiResponse = new DefaultApiResponse<>(
@@ -97,8 +88,6 @@ public class CourierController {
         return ResponseEntity.ok(defaultApiResponse);
     }
 
-    @Operation(summary = "Get all couriers with pagination")
-    @ApiResponse(responseCode = "200", description = "Couriers retrieved successfully")
     @GetMapping
     public ResponseEntity<DefaultApiResponse<Page<CourierResponse>>> getAllCouriers(@ParameterObject Pageable pageable) {
         Page<CourierResponse> response = courierService.getAllCouriers(pageable);
@@ -115,7 +104,7 @@ public class CourierController {
     @ApiResponse(responseCode = "200", description = "Couriers in zone retrieved successfully")
     @GetMapping("/zone/{zoneId}")
     public ResponseEntity<DefaultApiResponse<Page<CourierResponse>>> getCouriersByZone(
-            @Parameter(description = "Zone ID") @PathVariable String zoneId,
+            @PathVariable Long zoneId,
             @ParameterObject Pageable pageable) {
         Page<CourierResponse> response = courierService.getCouriersByZone(zoneId, pageable);
         DefaultApiResponse<Page<CourierResponse>> defaultApiResponse = new DefaultApiResponse<>(
@@ -131,7 +120,7 @@ public class CourierController {
     @ApiResponse(responseCode = "200", description = "Courier deleted successfully")
     @DeleteMapping("/{courierId}")
     public ResponseEntity<DefaultApiResponse<Void>> deleteCourier(
-            @Parameter(description = "Courier ID") @PathVariable String courierId) {
+            @PathVariable Long courierId) {
         courierService.deleteCourier(courierId);
         DefaultApiResponse<Void> defaultApiResponse = new DefaultApiResponse<>(
                 true,

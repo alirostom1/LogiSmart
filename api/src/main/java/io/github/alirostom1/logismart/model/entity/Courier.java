@@ -22,21 +22,27 @@ import java.util.UUID;
 @SuperBuilder
 @AllArgsConstructor
 @DiscriminatorValue(value = "courier")
-public class Courier extends Person{
+public class Courier extends User{
 
     @Column(nullable = false)
     private String vehicle;
 
-    @OneToMany(mappedBy = "collectingCourier", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "collectingCourier",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @JsonIgnore
     private List<Delivery> collectingDeliveries = new ArrayList<>();
 
-    @OneToMany(mappedBy = "shippingCourier", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "shippingCourier",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @JsonIgnore
     private List<Delivery> shippingDeliveries = new ArrayList<>();
-    
 
-    @ManyToOne
-    @JoinColumn(name = "zone_id",nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "assigned_zone_id", nullable = false)
     private Zone zone;
 }
