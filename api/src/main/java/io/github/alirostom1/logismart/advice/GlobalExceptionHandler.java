@@ -7,6 +7,7 @@ import io.github.alirostom1.logismart.exception.PostalCodeAlreadyExistsException
 import io.github.alirostom1.logismart.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -49,6 +50,18 @@ public class GlobalExceptionHandler {
                 System.currentTimeMillis()
         );
         return ResponseEntity.badRequest().body(defaultApiResponse);
+    }
+
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<DefaultApiResponse<Void>> handleAuthenticationException(AuthenticationException ex){
+        DefaultApiResponse<Void> apiResponse = new DefaultApiResponse<>(
+                false,
+                "Invalid credentials!",
+                null,
+                System.currentTimeMillis()
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiResponse);
     }
 
     //CUSTOM EXCEPTIONS

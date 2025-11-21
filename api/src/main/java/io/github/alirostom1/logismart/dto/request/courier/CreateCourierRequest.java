@@ -31,10 +31,6 @@ public class CreateCourierRequest {
     @NotBlank(message = "Phone number is required")
     private String phone;
 
-    @NotBlank(message = "Address is required")
-    private String address;
-
     @NotBlank(message = "Zone ID is required")
-    @ValidUUID
-    private String zoneId;
+    private Long zoneId;
 }

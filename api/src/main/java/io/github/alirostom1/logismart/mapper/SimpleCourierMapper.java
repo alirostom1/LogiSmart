@@ -5,7 +5,7 @@ import io.github.alirostom1.logismart.model.entity.Courier;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",uses = {ZoneMapper.class})
 public interface SimpleCourierMapper {
     @Mapping(target = "id", source = "id")
     @Mapping(target = "lastName", source = "lastName")

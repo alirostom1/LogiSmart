@@ -12,6 +12,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AssignDeliveryRequest {
     @NotBlank(message = "Courier ID is required")
-    @ValidUUID
-    private String courierId;
+    private Long courierId;
 }

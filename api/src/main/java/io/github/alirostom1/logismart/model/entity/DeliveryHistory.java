@@ -15,23 +15,19 @@ import java.util.UUID;
 
 @Entity
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor
-public class DeliveryHistory {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class DeliveryHistory extends AbstractAuditableEntity {
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private DeliveryStatus status;
 
-    @CreationTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 
     @Column(columnDefinition = "TEXT")
     private String comment;
 
-    @ManyToOne
-    @JoinColumn(name = "delivery_id",nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "delivery_id", nullable = false, updatable = false)
     private Delivery delivery;
+
 
 }

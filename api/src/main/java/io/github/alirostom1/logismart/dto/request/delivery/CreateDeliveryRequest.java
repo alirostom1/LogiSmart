@@ -2,10 +2,8 @@ package io.github.alirostom1.logismart.dto.request.delivery;
 
 import io.github.alirostom1.logismart.model.enums.DeliveryPriority;
 import io.github.alirostom1.logismart.util.ValidUUID;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Positive;
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,27 +28,41 @@ public class CreateDeliveryRequest {
             message = "Priority must be one of: LOW, MEDIUM, HIGH")
     private String priority;
 
-    @NotBlank(message = "Sender ID is required")
-    @ValidUUID
-    private String senderId;
+    @NotBlank
+    private String pickupAddress;
 
-    @NotBlank(message = "Recipient ID is required")
-    @ValidUUID
-    private String recipientId;
+    @NotBlank
+    private String pickupPostalCode;
 
-    @NotBlank(message = "Zone ID is required")
-    @ValidUUID
-    private String zoneId;
+    @NotBlank
+    private String shippingAddress;
+
+    @NotBlank
+    private String shippingPostalCode;
+
+    @NotNull
+    private RecipientRequest recipientData;
 
     private List<DeliveryProductRequest> products;
+
+    public static record RecipientRequest (
+            String name,
+            @Email(message = "Email must be valid")
+            String email,
+            @NotBlank(message = "Phone is required")
+            String phone
+    ) {
+        public boolean isNewRecipient() {
+            return name != null && !name.isBlank();
+        }
+    }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class DeliveryProductRequest {
         @NotBlank(message = "Product ID is required")
-        @ValidUUID
-        private String productId;
+        private Long productId;
 
         @NotNull(message = "Quantity is required")
         @Positive(message = "Quantity must be positive")

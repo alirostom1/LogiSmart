@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Getter @Setter
@@ -14,18 +13,23 @@ import java.util.UUID;
 @SuperBuilder
 @Table(name = "zones")
 public class Zone extends AbstractAuditableEntity{
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "postal_code",nullable = false,unique = true)
-    private int postalCode;
+    @Column(length = 10)
+    private String code; // PREFIXES FOR TRACKING PURPOSES
+
+    private boolean active = true;
 
     @OneToMany(mappedBy = "zone",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<Courier> couriers;
-    @OneToMany(mappedBy = "zone",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private List<Delivery> deliveries;
+    @OneToMany(mappedBy = "pickupZone", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Delivery> pickups = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "shippingZone", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Delivery> shipments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "zone", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<ZonePostalCode> postalCodes = new HashSet<>();
 }

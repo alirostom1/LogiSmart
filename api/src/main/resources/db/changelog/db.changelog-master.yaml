@@ -1,4 +1,7 @@
 databaseChangeLog:
+
   - include:
-      file: db/changelog/init-schema.yaml
+      file: db/changelog/init_schema-changelog.yaml
+
+
 

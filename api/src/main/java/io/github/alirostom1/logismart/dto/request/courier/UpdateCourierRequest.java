@@ -28,6 +28,5 @@ public class UpdateCourierRequest {
     private String phoneNumber;
 
     @NotBlank(message = "Zone ID is required")
-    @ValidUUID
-    private String zoneId;
+    private Long zoneId;
 }

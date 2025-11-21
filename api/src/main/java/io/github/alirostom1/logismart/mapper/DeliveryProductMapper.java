@@ -16,7 +16,7 @@ public interface DeliveryProductMapper {
     @Mapping(target = "category", source = "product.category")
     @Mapping(target = "unitPrice", source = "product.unitPrice")
     @Mapping(target = "quantity" ,source = "quantity")
-    @Mapping(target = "totalPrice", source = "price")
+    @Mapping(target = "totalPrice", source = "priceAtOrder")
     ProductInDeliveryResponse toResponse(DeliveryProduct deliveryProduct);
 
     List<ProductInDeliveryResponse> toResponseList(List<DeliveryProduct> deliveryProducts);
