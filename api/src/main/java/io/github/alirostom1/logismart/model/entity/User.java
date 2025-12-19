@@ -7,9 +7,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter @Setter
@@ -35,18 +34,25 @@ public class User extends AbstractAuditableEntity implements UserDetails{
     @Column(nullable = false,unique = false)
     private String phone;
 
-    @Column(name = "type", insertable = false, updatable = false)
-    private String role;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
+
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (role == null) {
-            DiscriminatorValue discriminatorValue = this.getClass().getAnnotation(DiscriminatorValue.class);
-            String fallbackRole = discriminatorValue != null ? discriminatorValue.value() : "user";
-            return List.of(new SimpleGrantedAuthority("ROLE_" + fallbackRole.toUpperCase()));
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        if(role != null){
+            authorities.add(new SimpleGrantedAuthority(role.getName().name().toUpperCase()));
+
+            authorities.addAll(
+                    role.getPermissions().stream()
+                            .map(permission -> new SimpleGrantedAuthority(permission.getName().name()))
+                            .collect(Collectors.toSet())
+            );
         }
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
+        return authorities;
     }
 
     @Override

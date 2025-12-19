@@ -1,0 +1,1340 @@
+{
+	"info": {
+		"_postman_id": "logismart-api-collection",
+		"name": "LogiSmart API",
+		"description": "Collection complète pour tester l'API LogiSmart avec authentification JWT et gestion des permissions",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login - Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.tokenPair) {",
+									"        pm.environment.set(\"admin_access_token\", jsonData.data.tokenPair.accessToken);",
+									"        pm.environment.set(\"admin_refresh_token\", jsonData.data.tokenPair.refreshToken);",
+									"        console.log(\"Admin token saved\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@logismart.com\",\n    \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login - Manager",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.tokenPair) {",
+									"        pm.environment.set(\"manager_access_token\", jsonData.data.tokenPair.accessToken);",
+									"        pm.environment.set(\"manager_refresh_token\", jsonData.data.tokenPair.refreshToken);",
+									"        console.log(\"Manager token saved\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"manager@logismart.com\",\n    \"password\": \"manager123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login - Courier",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.tokenPair) {",
+									"        pm.environment.set(\"courier_access_token\", jsonData.data.tokenPair.accessToken);",
+									"        pm.environment.set(\"courier_refresh_token\", jsonData.data.tokenPair.refreshToken);",
+									"        console.log(\"Courier token saved\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"courier1@logismart.com\",\n    \"password\": \"courier123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login - Sender",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.tokenPair) {",
+									"        pm.environment.set(\"sender_access_token\", jsonData.data.tokenPair.accessToken);",
+									"        pm.environment.set(\"sender_refresh_token\", jsonData.data.tokenPair.refreshToken);",
+									"        console.log(\"Sender token saved\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"sender1@logismart.com\",\n    \"password\": \"sender123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Register - Sender",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"New\",\n    \"lastName\": \"Sender\",\n    \"email\": \"newsender@example.com\",\n    \"password\": \"password123\",\n    \"phone\": \"+33123456799\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"{{admin_refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/auth/refresh",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "auth", "refresh"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin - Permissions Management",
+			"item": [
+				{
+					"name": "Get All Permissions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/admin/permissions",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "admin", "permissions"]
+						}
+					}
+				},
+				{
+					"name": "Create Permission",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"CUSTOM_PERMISSION\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/admin/permissions",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "admin", "permissions"]
+						}
+					}
+				},
+				{
+					"name": "Get Role Permissions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/admin/roles/1/permissions",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "admin", "roles", "1", "permissions"]
+						}
+					}
+				},
+				{
+					"name": "Assign Permission to Role",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"roleId\": 1,\n    \"permissionId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/admin/roles/assign-permission",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "admin", "roles", "assign-permission"]
+						}
+					}
+				},
+				{
+					"name": "Revoke Permission from Role",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"roleId\": 1,\n    \"permissionId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/admin/roles/revoke-permission",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "admin", "roles", "revoke-permission"]
+						}
+					}
+				},
+				{
+					"name": "Delete Permission",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/admin/permissions/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "admin", "permissions", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Deliveries",
+			"item": [
+				{
+					"name": "Create Delivery (Sender)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{sender_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"Livraison de colis urgent\",\n    \"weightKg\": 2.5,\n    \"priority\": \"HIGH\",\n    \"pickupAddress\": \"123 Rue de la Paix, Paris\",\n    \"pickupPostalCode\": \"75001\",\n    \"shippingAddress\": \"456 Avenue des Champs-Élysées, Paris\",\n    \"shippingPostalCode\": \"75008\",\n    \"recipientData\": {\n        \"name\": \"Jean Dupont\",\n        \"phone\": \"+33123456789\",\n        \"email\": \"jean.dupont@example.com\"\n    },\n    \"products\": []\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/deliveries",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "deliveries"]
+						}
+					}
+				},
+				{
+					"name": "Get Delivery by ID (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/deliveries/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "deliveries", "1"]
+						}
+					}
+				},
+				{
+					"name": "Track Delivery (Public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/deliveries/tracking/{{tracking_number}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "deliveries", "tracking", "{{tracking_number}}"]
+						}
+					}
+				},
+				{
+					"name": "Update Delivery Status (Courier)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{courier_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"COLLECTED\",\n    \"comment\": \"Colis collecté avec succès\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/deliveries/1/status",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "deliveries", "1", "status"]
+						}
+					}
+				},
+				{
+					"name": "Assign Collecting Courier (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"courierId\": 3\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/deliveries/1/assign-collecting-courier",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "deliveries", "1", "assign-collecting-courier"]
+						}
+					}
+				},
+				{
+					"name": "Assign Shipping Courier (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"courierId\": 3\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/deliveries/1/assign-shipping-courier",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "deliveries", "1", "assign-shipping-courier"]
+						}
+					}
+				},
+				{
+					"name": "Get My Deliveries (Courier)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{courier_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/deliveries/my-deliveries?page=0&size=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "deliveries", "my-deliveries"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Deliveries by Sender (Sender)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{sender_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/deliveries/sender/5?page=0&size=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "deliveries", "sender", "5"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Search Deliveries (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"searchTerm\": \"\",\n    \"status\": \"CREATED\",\n    \"priority\": \"\",\n    \"pickupZoneId\": null,\n    \"deliveryZoneId\": null\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/deliveries/search?page=0&size=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "deliveries", "search"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Delivery (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/deliveries/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "deliveries", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Couriers",
+			"item": [
+				{
+					"name": "Get All Couriers (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/couriers?page=0&size=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "couriers"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Courier by ID (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/couriers/3",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "couriers", "3"]
+						}
+					}
+				},
+				{
+					"name": "Create Courier (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Nouveau\",\n    \"lastName\": \"Livreur\",\n    \"email\": \"nouveau.courier@logismart.com\",\n    \"password\": \"courier123\",\n    \"phone\": \"+33123456795\",\n    \"vehicle\": \"Vélo\",\n    \"zoneId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/couriers",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "couriers"]
+						}
+					}
+				},
+				{
+					"name": "Update Courier (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Pierre\",\n    \"lastName\": \"Martin\",\n    \"email\": \"courier1@logismart.com\",\n    \"phoneNumber\": \"+33123456791\",\n    \"vehicle\": \"Vélo électrique\",\n    \"zoneId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/couriers/3",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "couriers", "3"]
+						}
+					}
+				},
+				{
+					"name": "Get Courier with Deliveries (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/couriers/3/with-deliveries",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "couriers", "3", "with-deliveries"]
+						}
+					}
+				},
+				{
+					"name": "Get Couriers by Zone (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/couriers/zone/1?page=0&size=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "couriers", "zone", "1"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Courier (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/couriers/3",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "couriers", "3"]
+						}
+					}
+				},
+				{
+					"name": "Try Access as Courier (Should Fail)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{courier_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/couriers",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "couriers"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Zones",
+			"item": [
+				{
+					"name": "Get All Zones (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/zones?page=0&size=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "zones"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Zone by ID (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/zones/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "zones", "1"]
+						}
+					}
+				},
+				{
+					"name": "Create Zone (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Zone Est\",\n    \"code\": \"ZE\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/zones",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "zones"]
+						}
+					}
+				},
+				{
+					"name": "Update Zone (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Zone Nord Modifiée\",\n    \"code\": \"ZN\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/zones/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "zones", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Zone (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/zones/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "zones", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Get All Products (Manager)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/products?page=0&size=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "products"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get My Products (Sender)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{sender_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/products/my-products?page=0&size=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "products", "my-products"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Product (Sender)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{sender_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Produit Test\",\n    \"category\": \"Électronique\",\n    \"unitPrice\": 99.99\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/products",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "products"]
+						}
+					}
+				},
+				{
+					"name": "Get Product by ID (Sender)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{sender_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/products/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "products", "1"]
+						}
+					}
+				},
+				{
+					"name": "Update Product (Sender)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{sender_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Produit Modifié\",\n    \"category\": \"Électronique\",\n    \"unitPrice\": 149.99\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v3/products/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "products", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Product (Sender)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{sender_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/products/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "products", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Authorization Tests",
+			"item": [
+				{
+					"name": "Test - Courier Access Denied to Couriers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{courier_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/couriers",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "couriers"]
+						}
+					}
+				},
+				{
+					"name": "Test - Sender Access Denied to Zones",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{sender_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/zones",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "zones"]
+						}
+					}
+				},
+				{
+					"name": "Test - Manager Access Denied to Admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{manager_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/admin/permissions",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "admin", "permissions"]
+						}
+					}
+				},
+				{
+					"name": "Test - No Token (401)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v3/deliveries",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v3", "deliveries"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "admin_access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "admin_refresh_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "manager_access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "manager_refresh_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "courier_access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "courier_refresh_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "sender_access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "sender_refresh_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "tracking_number",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
+

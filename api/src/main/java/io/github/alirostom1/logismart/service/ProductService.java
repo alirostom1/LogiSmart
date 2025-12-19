@@ -47,7 +47,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     public ProductResponse getProductById(Long productId,Long userId){
         Product product = findById(productId);
-        if(product.getSender().getId().equals(userId)){
+        if(!product.getSender().getId().equals(userId)){
             throw new UnownedRessourceException("You don't own this product!");
         }
         return productMapper.toResponse(product);

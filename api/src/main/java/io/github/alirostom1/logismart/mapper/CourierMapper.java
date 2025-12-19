@@ -14,6 +14,8 @@ import java.util.List;
 @Mapper(componentModel = "spring",uses = {ZoneMapper.class,DeliveryMapper.class})
 public interface CourierMapper {
 
+    @Mapping(target = "createdAt", source = "createdAt")
+    @Mapping(target = "updatedAt", source = "updatedAt")
     CourierResponse toResponse(Courier courier);
 
     @Mapping(target = "totalDeliveries",
@@ -24,6 +26,7 @@ public interface CourierMapper {
     @Mapping(target = "completedDeliveries",
             expression = "java((int) courier.getCollectingDeliveries().stream().filter(d -> d.getStatus() == io.github.alirostom1.logismart.model.enums.DeliveryStatus.IN_STOCK).count() + " +
                     "(int)courier.getShippingDeliveries().stream().filter(d -> d.getStatus() == io.github.alirostom1.logismart.model.enums.DeliveryStatus.DELIVERED).count())")
+    @Mapping(target = "createdAt", source = "createdAt")
     CourierWithDeliveriesResponse toWithDeliveriesResponse(Courier courier);
 
 

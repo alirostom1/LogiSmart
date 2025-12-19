@@ -2,6 +2,7 @@ package io.github.alirostom1.logismart.dto.request.courier;
 
 import io.github.alirostom1.logismart.util.ValidUUID;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,6 @@ public class UpdateCourierRequest {
     @NotBlank(message = "Phone number is required")
     private String phoneNumber;
 
-    @NotBlank(message = "Zone ID is required")
+    @NotNull(message = "Zone ID is required")
     private Long zoneId;
 }

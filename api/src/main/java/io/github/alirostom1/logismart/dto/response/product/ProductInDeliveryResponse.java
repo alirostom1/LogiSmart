@@ -18,5 +18,5 @@ public class ProductInDeliveryResponse {
     private int quantity;
     private double unitPrice;
     private double totalPrice;
-    private String addedAt;
+    private LocalDateTime addedAt;
 }

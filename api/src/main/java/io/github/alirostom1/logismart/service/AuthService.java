@@ -10,10 +10,14 @@ import io.github.alirostom1.logismart.exception.PhoneAlreadyExistsException;
 import io.github.alirostom1.logismart.exception.ResourceNotFoundException;
 import io.github.alirostom1.logismart.mapper.PersonMapper;
 import io.github.alirostom1.logismart.mapper.SenderMapper;
+import io.github.alirostom1.logismart.model.entity.Role;
 import io.github.alirostom1.logismart.model.entity.Sender;
 import io.github.alirostom1.logismart.model.entity.User;
+import io.github.alirostom1.logismart.model.enums.ERole;
+import io.github.alirostom1.logismart.repository.RoleRepository;
 import io.github.alirostom1.logismart.repository.SenderRepo;
 import io.github.alirostom1.logismart.repository.UserRepo;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.h2.command.Token;
@@ -29,7 +33,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final PersonMapper personMapper;
     private final SenderRepo senderRepo;
-    private final UserRepo userRepo;
+    private final RoleRepository roleRepository;
     private final SenderMapper senderMapper;
     private final JWTService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -40,8 +44,8 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword())
         );
         User user = (User) authentication.getPrincipal();
-        String role = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).findFirst().orElse("USER");
-        TokenPair tokenPair = jwtService.generateTokenPair(user);
+        String role = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).findFirst().orElse("ROLE_RECIPIENT");
+        TokenPair tokenPair = jwtService.generateTokenPair(user,null);
         return AuthResponse.builder()
                 .personResponse(personMapper.toResponse(user))
                 .tokenPair(tokenPair)
@@ -57,26 +61,25 @@ public class AuthService {
         }
         Sender sender = senderMapper.toSenderEntity(request);
         sender.setPassword(passwordEncoder.encode(request.getPassword()));
+        Role role = roleRepository.findByName(ERole.ROLE_SENDER)
+                .orElseThrow(() -> new ResourceNotFoundException("Sender Role not found!"));
+        sender.setRole(role);
         Sender savedSender = senderRepo.save(sender);
-        TokenPair tokenPair = jwtService.generateTokenPair(sender);
+        TokenPair tokenPair = jwtService.generateTokenPair(sender,null);
         return AuthResponse.builder()
                 .tokenPair(tokenPair)
-                .role("ROLE_" + savedSender.getRole())
+                .role(savedSender.getRole().getName() + "")
                 .personResponse(senderMapper.entitytoRegisterResponse(savedSender))
                 .build();
     }
     public AuthResponse refresh(RefreshRequest request){
-        if(!jwtService.validateRefreshToken(request.getRefreshToken())){
-            throw new JwtException("Invalid token!");
-        }
-        Long userId = jwtService.extractUserId(request.getRefreshToken());
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
-        TokenPair tokenPair = jwtService.generateTokenPair(user);
+        User user = jwtService.extractUser(request.getRefreshToken());
+        TokenPair tokenPair = jwtService.rotateRefreshToken(request.getRefreshToken(),user);
+
         return AuthResponse.builder()
                 .personResponse(personMapper.toResponse(user))
                 .tokenPair(tokenPair)
-                .role("ROLE_" + user.getRole())
+                .role(user.getRole() + "")
                 .build();
     }
 }

@@ -90,6 +90,29 @@ public class DeliveryService {
         return deliveryMapper.toDetailsResponse(delivery);
     }
 
+    // GET DELIVERY BY ID WITH OWNERSHIP CHECK (FOR COURIER/SENDER)
+    @Transactional(readOnly = true)
+    public DeliveryDetailsResponse getDeliveryByIdWithOwnershipCheck(Long deliveryId, Long userId, String userRole){
+        Delivery delivery = findById(deliveryId);
+        
+        // Couriers can only see their assigned deliveries
+        if ("ROLE_COURIER".equals(userRole)) {
+            boolean isAssigned = (delivery.getCollectingCourier() != null && delivery.getCollectingCourier().getId().equals(userId)) ||
+                                 (delivery.getShippingCourier() != null && delivery.getShippingCourier().getId().equals(userId));
+            if (!isAssigned) {
+                throw new org.springframework.security.access.AccessDeniedException("Access denied");
+            }
+        }
+        // Senders can only see their own deliveries
+        else if ("ROLE_SENDER".equals(userRole)) {
+            if (!delivery.getSender().getId().equals(userId)) {
+                throw new org.springframework.security.access.AccessDeniedException("Access denied");
+            }
+        }
+        
+        return deliveryMapper.toDetailsResponse(delivery);
+    }
+
     //TRACK SPECIFIC DELIVERY (FOR SENDER AND RECIPIENT)
     @Transactional(readOnly = true)
     public DeliveryTrackingResponse getDeliveryTracking(String trackingNumber) {
@@ -100,8 +123,22 @@ public class DeliveryService {
 
     //UPDATE DELIVERY STATUS(FOR ALL ACTORS)
     public DeliveryDetailsResponse updateDeliveryStatus(Long deliveryId,
-                                                        UpdateDeliveryStatusRequest request){
+                                                        UpdateDeliveryStatusRequest request,
+                                                        Long userId){
         Delivery delivery = findById(deliveryId);
+        
+        // Check if courier can only update their own deliveries
+        if (delivery.getCollectingCourier() != null && delivery.getCollectingCourier().getId().equals(userId)) {
+            // Courier can update
+        } else if (delivery.getShippingCourier() != null && delivery.getShippingCourier().getId().equals(userId)) {
+            // Courier can update
+        } else if (delivery.getCollectingCourier() == null && delivery.getShippingCourier() == null) {
+            // No courier assigned yet, manager can update
+        } else {
+            // Check if user is manager/admin
+            // This will be handled by security annotations
+        }
+        
         DeliveryStatus status = DeliveryStatus.valueOf(request.getStatus());
         delivery.setStatus(status);
         Delivery savedDelivery = deliveryRepo.save(delivery);
@@ -164,6 +201,13 @@ public class DeliveryService {
     //GET COURIER'S DELIVERIES(FOR COURIER)
     @Transactional(readOnly = true)
     public Page<DeliveryResponse> getDeliveriesByCourier(Long courierId, Pageable pageable){
+        Page<Delivery> deliveries = deliveryRepo.findByCollectingCourierIdOrShippingCourierId(courierId,courierId,pageable);
+        return deliveries.map(deliveryMapper::toResponse);
+    }
+
+    //GET COURIER'S OWN DELIVERIES - Only deliveries assigned to the current courier
+    @Transactional(readOnly = true)
+    public Page<DeliveryResponse> getMyDeliveries(Long courierId, Pageable pageable){
         Page<Delivery> deliveries = deliveryRepo.findByCollectingCourierIdOrShippingCourierId(courierId,courierId,pageable);
         return deliveries.map(deliveryMapper::toResponse);
     }

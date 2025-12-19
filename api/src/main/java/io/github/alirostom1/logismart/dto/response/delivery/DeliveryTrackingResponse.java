@@ -21,5 +21,5 @@ public class DeliveryTrackingResponse {
     private String senderName;
     private String collectingCourierName;
     private String shippingCourierName;
-    private String lastUpdate;
+    private LocalDateTime lastUpdate;
 }

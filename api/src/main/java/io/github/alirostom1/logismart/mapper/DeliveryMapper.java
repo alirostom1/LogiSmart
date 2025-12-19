@@ -23,12 +23,16 @@ public interface DeliveryMapper {
             expression = "java(delivery.getCollectingCourier() != null ? delivery.getCollectingCourier().getFirstName() + \" \" + delivery.getCollectingCourier().getLastName() : null)")
     @Mapping(target = "shippingCourierName",
             expression = "java(delivery.getShippingCourier() != null ? delivery.getShippingCourier().getFirstName() + \" \" + delivery.getShippingCourier().getLastName() : null)")
+    @Mapping(target = "createdAt", source = "createdAt")
+    @Mapping(target = "updatedAt", source = "updatedAt")
     DeliveryResponse toResponse(Delivery delivery);
 
     @Mapping(target = "products", source = "deliveryProducts")
     @Mapping(target = "history", source = "deliveryHistoryList")
     @Mapping(target = "collectingCourier", source = "collectingCourier")
     @Mapping(target = "shippingCourier", source = "shippingCourier")
+    @Mapping(target = "createdAt", source = "createdAt")
+    @Mapping(target = "updatedAt", source = "updatedAt")
     DeliveryDetailsResponse toDetailsResponse(Delivery delivery);
 
     @Mapping(target = "currentStatus", source = "status")

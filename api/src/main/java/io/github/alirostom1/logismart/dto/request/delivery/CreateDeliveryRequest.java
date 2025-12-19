@@ -61,7 +61,7 @@ public class CreateDeliveryRequest {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class DeliveryProductRequest {
-        @NotBlank(message = "Product ID is required")
+        @NotNull(message = "Product ID is required")
         private Long productId;
 
         @NotNull(message = "Quantity is required")

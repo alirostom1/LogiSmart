@@ -47,6 +47,15 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/actuator/**"
                         ).permitAll()
+                        // Admin endpoints - only ADMIN
+                        .requestMatchers("/api/v3/admin/**").hasRole("ADMIN")
+                        // Manager endpoints - MANAGER or ADMIN
+                        .requestMatchers("/api/v3/couriers/**", "/api/v3/zones/**").hasAnyRole("MANAGER", "ADMIN")
+                        // Delivery endpoints - handled by method security
+                        .requestMatchers("/api/v3/deliveries/**").authenticated()
+                        // Product endpoints - handled by method security
+                        .requestMatchers("/api/v3/products/**").authenticated()
+                        // All other requests require authentication
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
@@ -67,13 +76,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration config = new CorsConfiguration();
+        // Only allow internal frontends
         config.setAllowedOrigins(List.of(
                 "http://localhost:4200",
                 "http://localhost:3000",
                 "http://localhost:8080"
         ));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        config.setAllowedHeaders(List.of("*"));
+        // Standard REST methods
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH","HEAD"));
+        // Authorization and Content-Type headers
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
 

@@ -19,6 +19,6 @@ public class CourierResponse {
     private String vehicle;
     private String phoneNumber;
     private ZoneResponse zone;
-    private String createdAt;
-    private String updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

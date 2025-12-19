@@ -26,6 +26,6 @@ public class DeliveryResponse {
     private String shippingZoneName;
     private String collectingCourierName;
     private String shippingCourierName;
-    private String createdAt;
-    private String updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

@@ -20,6 +20,7 @@ import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,22 +38,41 @@ public class JWTService {
     private long JWT_REFRESH_TTL;
 
     private final UserRepo userRepo;
+    private final TokenBlacklistService blacklistService;
 
 
-    public TokenPair generateTokenPair(User user){
+    public TokenPair generateTokenPair(User user,String familyId){
         // ACCESS TOKEN GENERATION
         HashMap<String,Object> accessClaims = new HashMap<>();
-        accessClaims.put("role",user.getAuthorities().stream().map(GrantedAuthority::getAuthority).findFirst().orElse("USER"));
+        String role = user.getAuthorities().stream()
+                .filter(auth -> auth.getAuthority().startsWith("ROLE_"))
+                .map(GrantedAuthority::getAuthority)
+                .findFirst()
+                .orElse("ROLE_USER");
+        accessClaims.put("role", role);
         accessClaims.put("email",user.getEmail());
         accessClaims.put("type","access");
+        
+        // Add permissions to token
+        List<String> permissions = user.getAuthorities().stream()
+                .filter(auth -> !auth.getAuthority().startsWith("ROLE_"))
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+        accessClaims.put("permissions", permissions);
+        
         String accessToken = buildToken(accessClaims,user.getId().toString(),JWT_ACCESS_TTL);
 
         // REFRESH TOKEN GENERATION
+        String family = familyId != null ? familyId : UUID.randomUUID().toString();
+        String jti = UUID.randomUUID().toString();
         HashMap<String,Object> refreshClaims = new HashMap<>();
-        refreshClaims.put("role",user.getAuthorities().stream().map(GrantedAuthority::getAuthority).findFirst().orElse("USER"));
+        refreshClaims.put("role", role);
         refreshClaims.put("email",user.getEmail());
+        refreshClaims.put("family",family);
+        refreshClaims.put("jti",jti);
         refreshClaims.put("type","refresh");
         String refreshToken = buildToken(refreshClaims,user.getId().toString(),JWT_REFRESH_TTL);
+        blacklistService.rotateRefreshToken(user.getId(),family,jti);
 
         return TokenPair.builder()
                 .accessToken(accessToken)
@@ -62,6 +82,19 @@ public class JWTService {
                 .refreshTokenExpiresIn(JWT_REFRESH_TTL)
                 .build();
     }
+    public User extractUser(String token){
+        Long userId = extractUserId(token);
+        return userRepo.findById(userId)
+                .orElseThrow(() -> new JwtException("User in token doesnt exist anymore!"));
+    }
+
+    public TokenPair rotateRefreshToken(String refreshToken,User user){
+        validateRefreshToken(refreshToken);
+        Claims claims = extractClaims(refreshToken);
+        String family = claims.get("family", String.class);
+        return generateTokenPair(user,family);
+    }
+
 
     private String buildToken(Map<String,Object> extraClaims, String subject, long expiration){
         return Jwts.builder()
@@ -105,12 +138,18 @@ public class JWTService {
             return false;
         }
     }
-    public boolean validateRefreshToken(String token){
+    public void validateRefreshToken(String token){
         try{
             Claims claims = parseClaims(token);
-            return claims.get("type").equals("refresh") && !isExpired(claims);
+            if(!claims.get("type").equals("refresh") || isExpired(claims)){
+                throw new JwtException("Invalid or expired token!");
+            }
+            Long userId = extractUserId(token);
+            String family = claims.get("family",String.class);
+            String jti = claims.get("jti",String.class);
+            blacklistService.validateRefreshTokenIsStillActive(userId,family,jti);
         }catch (Exception e){
-            return false;
+            throw new JwtException("Invalid token");
         }
     }
 }

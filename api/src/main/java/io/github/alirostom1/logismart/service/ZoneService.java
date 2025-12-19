@@ -13,7 +13,8 @@ import io.github.alirostom1.logismart.model.entity.ZonePostalCode;
 import io.github.alirostom1.logismart.repository.ZonePostalCodeRepo;
 import io.github.alirostom1.logismart.repository.ZoneRepo;
 import lombok.RequiredArgsConstructor;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,6 +89,34 @@ public class ZoneService {
 
         zonePostalCodeRepo.saveAll(zonePostalCodes);
         return zoneMapper.toResponse(zone);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ZoneResponse> getAllZones(Pageable pageable) {
+        return zoneRepo.findAll(pageable).map(zoneMapper::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public ZoneResponse getZoneById(Long zoneId) {
+        Zone zone = zoneRepo.findById(zoneId)
+                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
+        return zoneMapper.toResponse(zone);
+    }
+
+    public ZoneResponse updateZone(Long zoneId, CreateZoneRequest request) {
+        Zone zone = zoneRepo.findById(zoneId)
+                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
+        zone.setName(request.name());
+        zone.setCode(request.code());
+        Zone updated = zoneRepo.save(zone);
+        return zoneMapper.toResponse(updated);
+    }
+
+    public void deleteZone(Long zoneId) {
+        if (!zoneRepo.existsById(zoneId)) {
+            throw new ResourceNotFoundException("Zone not found");
+        }
+        zoneRepo.deleteById(zoneId);
     }
 
 }

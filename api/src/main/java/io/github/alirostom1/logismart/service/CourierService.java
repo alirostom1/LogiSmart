@@ -9,12 +9,17 @@ import io.github.alirostom1.logismart.exception.PhoneAlreadyExistsException;
 import io.github.alirostom1.logismart.exception.ResourceNotFoundException;
 import io.github.alirostom1.logismart.mapper.CourierMapper;
 import io.github.alirostom1.logismart.model.entity.Courier;
+import io.github.alirostom1.logismart.model.entity.Role;
 import io.github.alirostom1.logismart.model.entity.Zone;
+import io.github.alirostom1.logismart.model.enums.ERole;
 import io.github.alirostom1.logismart.repository.CourierRepo;
+import io.github.alirostom1.logismart.repository.RoleRepository;
 import io.github.alirostom1.logismart.repository.ZoneRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class CourierService {
     private final CourierRepo courierRepo;
     private final CourierMapper courierMapper;
+    private final PasswordEncoder passwordEncoder;
     private final ZoneRepo zoneRepo;
+    private final RoleRepository roleRepository;
 
     // CREATE COURIER (FOR MANAGER)
     public CourierResponse createCourier(CreateCourierRequest request) {
@@ -40,7 +47,14 @@ public class CourierService {
         }
 
         Courier courier = courierMapper.toEntity(request);
+        courier.setPassword(passwordEncoder.encode(request.getPassword()));
         courier.setZone(zone);
+        
+        // Assign ROLE_COURIER to the courier
+        Role courierRole = roleRepository.findByName(ERole.ROLE_COURIER)
+                .orElseThrow(() -> new ResourceNotFoundException("Courier Role not found!"));
+        courier.setRole(courierRole);
+        
         Courier savedCourier = courierRepo.save(courier);
         return courierMapper.toResponse(savedCourier);
     }
@@ -53,12 +67,13 @@ public class CourierService {
     }
 
     // GET COURIER WITH ASSIGNED DELIVERIES (FOR COURIER AND MANAGER)
+    @PreAuthorize("hasAuthority('COURIER_READ') or " +
+            "(@securityService.isSameUser(#courierId) and hasAuthority('COURIER_OWN_READ'))")
     @Transactional(readOnly = true)
     public CourierWithDeliveriesResponse getCourierWithDeliveries(Long courierId) {
         Courier courier = findById(courierId);
         return courierMapper.toWithDeliveriesResponse(courier);
     }
-
     // UPDATE COURIER INFORMATION (FOR MANAGER)
     public CourierResponse updateCourier(Long courierId, UpdateCourierRequest request) {
         Courier courier = findById(courierId);

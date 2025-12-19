@@ -36,6 +36,6 @@ public class DeliveryDetailsResponse {
     private ZoneResponse zone;
     private List<ProductInDeliveryResponse> products;
     private List<DeliveryHistoryResponse> history;
-    private String createdAt;
-    private String updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
