@@ -28,5 +28,5 @@ public class CourierWithDeliveriesResponse {
     private int totalDeliveries;
     private int pendingDeliveries;
     private int completedDeliveries;
-    private String createdAt;
+    private LocalDateTime createdAt;
 }

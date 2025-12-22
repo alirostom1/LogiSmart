@@ -1,26 +1,30 @@
 package io.github.alirostom1.logismart.model.entity;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
-@DiscriminatorValue(value = "recipient")
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Recipient extends Person{
+@SuperBuilder
+@Table(name = "recipients",uniqueConstraints = @UniqueConstraint(columnNames = {"phone", "postal_code"}))
+public class Recipient extends AbstractAuditableEntity{
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false,unique = true)
+    private String phone;
+
+    @Column(nullable = false,unique = true)
+    private String email;
+
     @OneToMany(mappedBy = "recipient", fetch = FetchType.EAGER)
     private List<Delivery> deliveries = new ArrayList<>();
-
-    public Recipient(UUID id, String lastName, String firstName, String email, String phone, String address, List<Delivery> deliveries) {
-        super(id, lastName, firstName, email, phone, address);
-        this.deliveries = deliveries;
-    }
 }

@@ -22,9 +22,10 @@ public class DeliveryResponse {
     private DeliveryPriority priority;
     private String recipientName;
     private String senderName;
-    private String zoneName;
+    private String pickupZoneName;
+    private String shippingZoneName;
     private String collectingCourierName;
     private String shippingCourierName;
-    private String createdAt;
-    private String updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

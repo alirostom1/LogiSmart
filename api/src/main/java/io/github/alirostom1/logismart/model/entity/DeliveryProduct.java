@@ -4,34 +4,28 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 @Entity
+@Table(name = "delivery_products",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"delivery_id", "product_id"}))
 @Getter @Setter
 @NoArgsConstructor
-public class DeliveryProduct{
-    @EmbeddedId
-    private DeliveryProductId id;
+@SuperBuilder
+public class DeliveryProduct extends AbstractAuditableEntity {
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "delivery_id", nullable = false)
+    private Delivery delivery;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
     @Column(nullable = false)
     private int quantity;
 
-    @Column(nullable = false)
-    private double price;
-
-    @CreationTimestamp
-    @Column(name = "added_at")
-    private LocalDateTime addedAt;
-
-    @ManyToOne
-    @MapsId("deliveryId")
-    @JoinColumn(name = "delivery_id")
-    private Delivery delivery;
-
-    @ManyToOne
-    @MapsId("productId")
-    @JoinColumn(name = "product_id")
-    private Product product;
+    @Column(name = "price_at_order",nullable = false, precision = 12, scale = 2)
+    private BigDecimal priceAtOrder;
 }

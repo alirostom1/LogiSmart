@@ -48,7 +48,8 @@ public class PersonServiceUnitTest {
     public void createSender_should_return_sender_response() {
         CreatePersonRequest req = new CreatePersonRequest("Doe", "John", "john@mail.com", "0711111111", "123 Road");
         Sender sender = personMapper.toSenderEntity(req);
-        Sender savedSender = sender; // In real use, assign an ID here if needed
+        Sender savedSender = sender;
+        savedSender.setDeliveries(List.of());
         SenderResponse expectedResp = personMapper.toSenderResponse(savedSender);
 
         when(personRepo.existsByEmail(req.getEmail())).thenReturn(false);
@@ -81,6 +82,7 @@ public class PersonServiceUnitTest {
         CreatePersonRequest req = new CreatePersonRequest("Smith", "Jane", "jane@mail.com", "0722222222", "456 Lane");
         Recipient recipient = personMapper.toRecipientEntity(req);
         Recipient savedRecipient = recipient;
+        savedRecipient.setDeliveries(List.of());
         RecipientResponse expectedResp = personMapper.toRecipientResponse(savedRecipient);
 
         when(personRepo.existsByEmail(req.getEmail())).thenReturn(false);
@@ -149,8 +151,9 @@ public class PersonServiceUnitTest {
     // GET ALL SENDERS
     @Test
     public void getAllSenders_should_return_senders() {
-        Sender sender1 = new Sender(UUID.randomUUID(), "Doe", "John", "john@mail.com", "0711111111", "Address",List.of());
-        Sender sender2 = new Sender(UUID.randomUUID(), "Doe2", "John2", "john2@mail.com", "0712222222", "Address2",List.of());
+        Sender sender1 = Sender.builder().id(UUID.randomUUID()).lastName("Doe").firstName("John").email("john@mail.com").phone("0711111111").address("Address").deliveries(List.of()).build();
+        Sender sender2 = Sender.builder().id(UUID.randomUUID()).lastName("Doe2").firstName("John2").email("john2@mail.com").phone("0712222222").address("Address2").deliveries(List.of()).build();
+
         Pageable pageable = PageRequest.of(0, 10);
         Page<Sender> page = new PageImpl<>(List.of(sender1, sender2), pageable, 2);
         Page<SenderResponse> expected = page.map(personMapper::toSenderResponse);
@@ -164,8 +167,8 @@ public class PersonServiceUnitTest {
     // GET ALL RECIPIENTS
     @Test
     public void getAllRecipients_should_return_recipients() {
-        Recipient recipient1 = new Recipient(UUID.randomUUID(), "Smith", "Jane", "jane@mail.com", "0722222222", "Place",List.of());
-        Recipient recipient2 = new Recipient(UUID.randomUUID(), "Brown", "Alice", "alice@mail.com", "0733333333", "Another Place",List.of());
+        Recipient recipient1 = Recipient.builder().id(UUID.randomUUID()).lastName("Doe").firstName("John").email("john@mail.com").phone("0711111111").address("Address").deliveries(List.of()).build();
+        Recipient recipient2 = Recipient.builder().id(UUID.randomUUID()).lastName("Doe2").firstName("John2").email("john2@mail.com").phone("0712222222").address("Address2").deliveries(List.of()).build();
         Pageable pageable = PageRequest.of(0, 10);
         Page<Recipient> page = new PageImpl<>(List.of(recipient1, recipient2), pageable, 2);
         Page<RecipientResponse> expected = page.map(personMapper::toRecipientResponse);
@@ -181,7 +184,7 @@ public class PersonServiceUnitTest {
     public void updateSender_should_update_and_return() {
         UUID id = UUID.randomUUID();
         UpdatePersonRequest req = new UpdatePersonRequest("Doe", "John", "john@newmail.com", "0799999999", "New Address");
-        Sender sender = new Sender(id, "Doe", "John", "john@mail.com", "0711111111", "Old Address",List.of());
+        Sender sender = Sender.builder().id(UUID.randomUUID()).lastName("Doe").firstName("John").email("john@mail.com").phone("0711111111").address("Old Address").deliveries(List.of()).build();
         Sender updatedSender = sender;
         personMapper.updateSenderFromRequest(req, sender);
         SenderResponse expectedResp = personMapper.toSenderResponse(updatedSender);
@@ -231,7 +234,7 @@ public class PersonServiceUnitTest {
     public void updateRecipient_should_update_and_return() {
         UUID id = UUID.randomUUID();
         UpdatePersonRequest req = new UpdatePersonRequest("Smith", "Jane", "jane@newmail.com", "0788888888", "New Place");
-        Recipient recipient = new Recipient(id, "Smith", "Jane", "jane@mail.com", "0722222222", "Old Place",List.of());
+        Recipient recipient = Recipient.builder().id(UUID.randomUUID()).lastName("Doe").firstName("John").email("john@mail.com").phone("0711111111").address("Address").deliveries(List.of()).build();
         Recipient updatedRecipient = recipient;
         personMapper.updateRecipientFromRequest(req, recipient); // MapStruct updates in-place
         RecipientResponse expectedResp = personMapper.toRecipientResponse(updatedRecipient);

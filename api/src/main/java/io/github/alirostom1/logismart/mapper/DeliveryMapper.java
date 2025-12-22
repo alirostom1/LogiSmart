@@ -14,26 +14,29 @@ import java.util.List;
         uses = {PersonMapper.class, ZoneMapper.class, DeliveryProductMapper.class, DeliveryHistoryMapper.class, SimpleCourierMapper.class})
 public interface DeliveryMapper {
     //RESPONSE MAPPING
-    @Mapping(target = "recipientName",
-            expression = "java(delivery.getRecipient().getFirstName() + \" \" + delivery.getRecipient().getLastName())")
+    @Mapping(target = "recipientName",source = "recipient.name")
     @Mapping(target = "senderName",
             expression = "java(delivery.getSender().getFirstName() + \" \" + delivery.getSender().getLastName())")
-    @Mapping(target = "zoneName", source = "zone.name")
+    @Mapping(target = "pickupZoneName", source = "pickupZone.name")
+    @Mapping(target = "shippingZoneName", source = "shippingZone.name")
     @Mapping(target = "collectingCourierName",
             expression = "java(delivery.getCollectingCourier() != null ? delivery.getCollectingCourier().getFirstName() + \" \" + delivery.getCollectingCourier().getLastName() : null)")
     @Mapping(target = "shippingCourierName",
             expression = "java(delivery.getShippingCourier() != null ? delivery.getShippingCourier().getFirstName() + \" \" + delivery.getShippingCourier().getLastName() : null)")
+    @Mapping(target = "createdAt", source = "createdAt")
+    @Mapping(target = "updatedAt", source = "updatedAt")
     DeliveryResponse toResponse(Delivery delivery);
 
     @Mapping(target = "products", source = "deliveryProducts")
     @Mapping(target = "history", source = "deliveryHistoryList")
     @Mapping(target = "collectingCourier", source = "collectingCourier")
     @Mapping(target = "shippingCourier", source = "shippingCourier")
+    @Mapping(target = "createdAt", source = "createdAt")
+    @Mapping(target = "updatedAt", source = "updatedAt")
     DeliveryDetailsResponse toDetailsResponse(Delivery delivery);
 
     @Mapping(target = "currentStatus", source = "status")
-    @Mapping(target = "recipientName",
-            expression = "java(delivery.getRecipient().getFirstName() + \" \" + delivery.getRecipient().getLastName())")
+    @Mapping(target = "recipientName",source = "recipient.name")
     @Mapping(target = "senderName",
             expression = "java(delivery.getSender().getFirstName() + \" \" + delivery.getSender().getLastName())")
     @Mapping(target = "collectingCourierName",
@@ -53,7 +56,8 @@ public interface DeliveryMapper {
     @Mapping(target = "status", constant = "CREATED")
     @Mapping(target = "sender", ignore = true)
     @Mapping(target = "recipient", ignore = true)
-    @Mapping(target = "zone", ignore = true)
+    @Mapping(target = "pickupZone", ignore = true)
+    @Mapping(target = "shippingZone", ignore = true)
     @Mapping(target = "collectingCourier", ignore = true)
     @Mapping(target = "shippingCourier", ignore = true)
     @Mapping(target = "deliveryProducts", ignore = true)

@@ -6,13 +6,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class ZoneResponse {
-    private String id;
-    private String name;
-    private int postalCode;
+import java.time.LocalDateTime;
+import java.util.List;
+
+public record ZoneResponse(
+        Long id,
+        String name,
+        String code,
+        boolean active,
+        int totalPostalCodes,
+        List<String> postalCodes,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+) {
 }

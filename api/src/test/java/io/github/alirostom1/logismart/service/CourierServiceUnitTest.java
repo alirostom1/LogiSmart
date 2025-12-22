@@ -7,16 +7,12 @@ import io.github.alirostom1.logismart.dto.response.courier.CourierWithDeliveries
 import io.github.alirostom1.logismart.exception.PhoneAlreadyExistsException;
 import io.github.alirostom1.logismart.exception.ResourceNotFoundException;
 import io.github.alirostom1.logismart.mapper.CourierMapper;
-import io.github.alirostom1.logismart.mapper.ZoneMapper;
 import io.github.alirostom1.logismart.model.entity.Courier;
 import io.github.alirostom1.logismart.model.entity.Zone;
-import io.github.alirostom1.logismart.repository.CourierRepo;
 import io.github.alirostom1.logismart.repository.ZoneRepo;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

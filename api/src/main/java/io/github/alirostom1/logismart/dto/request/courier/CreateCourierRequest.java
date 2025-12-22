@@ -1,8 +1,8 @@
 package io.github.alirostom1.logismart.dto.request.courier;
 
-import io.github.alirostom1.logismart.util.ValidUUID;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,13 +17,19 @@ public class CreateCourierRequest {
     @NotBlank(message = "First name is required")
     private String firstName;
 
+    @NotBlank(message = "First name is required")
+    private String email;
+
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, max = 32,message = "Password should be between 6 and 32 characters")
+    private String password;
+
     @NotBlank(message = "Vehicle is required")
     private String vehicle;
 
     @NotBlank(message = "Phone number is required")
-    private String phoneNumber;
+    private String phone;
 
-    @NotBlank(message = "Zone ID is required")
-    @ValidUUID
-    private String zoneId;
+    @NotNull(message = "Zone ID is required")
+    private Long zoneId;
 }

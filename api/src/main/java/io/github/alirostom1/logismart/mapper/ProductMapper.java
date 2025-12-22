@@ -12,10 +12,10 @@ public interface ProductMapper {
     ProductResponse toResponse(Product product);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "deliveryProduct", ignore = true)
+    @Mapping(target = "deliveryProducts", ignore = true)
     Product toEntity(CreateProductRequest request);
 
     @Mapping(target = "id",ignore = true)
-    @Mapping(target = "deliveryProduct", ignore = true)
+    @Mapping(target = "deliveryProducts", ignore = true)
     void updateFromRequest(CreateProductRequest request,@MappingTarget Product product);
 }

@@ -15,6 +15,6 @@ import java.time.LocalDateTime;
 public class DeliveryStatusResponse {
     private String id;
     private DeliveryStatus status;
-    private String lastUpdate;
+    private LocalDateTime lastUpdate;
     private String currentLocation;
 }

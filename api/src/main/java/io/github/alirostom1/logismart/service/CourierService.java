@@ -1,24 +1,27 @@
 package io.github.alirostom1.logismart.service;
 
-
 import io.github.alirostom1.logismart.dto.request.courier.CreateCourierRequest;
 import io.github.alirostom1.logismart.dto.request.courier.UpdateCourierRequest;
 import io.github.alirostom1.logismart.dto.response.courier.CourierResponse;
 import io.github.alirostom1.logismart.dto.response.courier.CourierWithDeliveriesResponse;
+import io.github.alirostom1.logismart.exception.EmailAlreadyExistsException;
 import io.github.alirostom1.logismart.exception.PhoneAlreadyExistsException;
 import io.github.alirostom1.logismart.exception.ResourceNotFoundException;
 import io.github.alirostom1.logismart.mapper.CourierMapper;
 import io.github.alirostom1.logismart.model.entity.Courier;
+import io.github.alirostom1.logismart.model.entity.Role;
 import io.github.alirostom1.logismart.model.entity.Zone;
+import io.github.alirostom1.logismart.model.enums.ERole;
 import io.github.alirostom1.logismart.repository.CourierRepo;
+import io.github.alirostom1.logismart.repository.RoleRepository;
 import io.github.alirostom1.logismart.repository.ZoneRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -26,42 +29,65 @@ import java.util.UUID;
 public class CourierService {
     private final CourierRepo courierRepo;
     private final CourierMapper courierMapper;
+    private final PasswordEncoder passwordEncoder;
     private final ZoneRepo zoneRepo;
+    private final RoleRepository roleRepository;
 
     // CREATE COURIER (FOR MANAGER)
-    public CourierResponse createCourier(CreateCourierRequest request){
-        Zone zone = zoneRepo.findById(UUID.fromString(request.getZoneId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Zone", request.getZoneId()));
-        if(courierRepo.existsByPhoneNumber(request.getPhoneNumber())){
-            throw new PhoneAlreadyExistsException(request.getPhoneNumber());
+    public CourierResponse createCourier(CreateCourierRequest request) {
+        Zone zone = zoneRepo.findById(request.getZoneId())
+                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
+
+        if (courierRepo.existsByPhone(request.getPhone())) {
+            throw new PhoneAlreadyExistsException(request.getPhone());
         }
+
+        if (courierRepo.existsByEmail(request.getEmail())) {
+            throw new EmailAlreadyExistsException(request.getEmail());
+        }
+
         Courier courier = courierMapper.toEntity(request);
+        courier.setPassword(passwordEncoder.encode(request.getPassword()));
         courier.setZone(zone);
+        
+        // Assign ROLE_COURIER to the courier
+        Role courierRole = roleRepository.findByName(ERole.ROLE_COURIER)
+                .orElseThrow(() -> new ResourceNotFoundException("Courier Role not found!"));
+        courier.setRole(courierRole);
+        
         Courier savedCourier = courierRepo.save(courier);
         return courierMapper.toResponse(savedCourier);
     }
+
     // GET COURIER DETAILS (FOR MANAGER)
     @Transactional(readOnly = true)
-    public CourierResponse getCourierById(String courierId) {
+    public CourierResponse getCourierById(Long courierId) {
         Courier courier = findById(courierId);
         return courierMapper.toResponse(courier);
     }
 
     // GET COURIER WITH ASSIGNED DELIVERIES (FOR COURIER AND MANAGER)
+    @PreAuthorize("hasAuthority('COURIER_READ') or " +
+            "(@securityService.isSameUser(#courierId) and hasAuthority('COURIER_OWN_READ'))")
     @Transactional(readOnly = true)
-    public CourierWithDeliveriesResponse getCourierWithDeliveries(String courierId) {
+    public CourierWithDeliveriesResponse getCourierWithDeliveries(Long courierId) {
         Courier courier = findById(courierId);
         return courierMapper.toWithDeliveriesResponse(courier);
     }
-
     // UPDATE COURIER INFORMATION (FOR MANAGER)
-    public CourierResponse updateCourier(String courierId, UpdateCourierRequest request) {
+    public CourierResponse updateCourier(Long courierId, UpdateCourierRequest request) {
         Courier courier = findById(courierId);
-        Zone zone = zoneRepo.findById(UUID.fromString(request.getZoneId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Zone", request.getZoneId()));
-        if(courierRepo.existsByPhoneNumberAndIdNot(request.getPhoneNumber(),UUID.fromString(courierId))){
+        Zone zone = zoneRepo.findById(request.getZoneId())
+                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
+
+        if (courierRepo.existsByPhoneAndIdNot(request.getPhoneNumber(), courierId)) {
             throw new PhoneAlreadyExistsException(request.getPhoneNumber());
         }
+
+        if (courierRepo.existsByEmailAndIdNot(request.getEmail(),courierId)) {
+            throw new EmailAlreadyExistsException(request.getEmail());
+        }
+
         courierMapper.updateFromRequest(request, courier);
         courier.setZone(zone);
 
@@ -78,24 +104,24 @@ public class CourierService {
 
     // GET COURIERS BY ZONE (FOR MANAGER)
     @Transactional(readOnly = true)
-    public Page<CourierResponse> getCouriersByZone(String zoneId, Pageable pageable) {
-        Page<Courier> couriers = courierRepo.findByZoneId(UUID.fromString(zoneId), pageable);
+    public Page<CourierResponse> getCouriersByZone(Long zoneId, Pageable pageable) {
+        Zone zone = zoneRepo.findById(zoneId)
+                .orElseThrow(() -> new ResourceNotFoundException("Zone not found!"));
+        Page<Courier> couriers = courierRepo.findCouriersByZone(zone, pageable);
         return couriers.map(courierMapper::toResponse);
     }
 
     // DELETE COURIER (FOR MANAGER)
-    public void deleteCourier(String courierId) {
-        if (!courierRepo.existsById(UUID.fromString(courierId))) {
-            throw new ResourceNotFoundException("Courier", courierId);
+    public void deleteCourier(Long courierId) {
+        if (!courierRepo.existsById(courierId)) {
+            throw new ResourceNotFoundException("Courier not found");
         }
-        courierRepo.deleteById(UUID.fromString(courierId));
+        courierRepo.deleteById(courierId);
     }
 
-    //FIND COURIER BY ID AND THROW EXCEPTION IF NOT FOUND
-    private Courier findById(String courierId) {
-        return courierRepo.findById(UUID.fromString(courierId))
-                .orElseThrow(() -> new ResourceNotFoundException("Courier", courierId));
+    // FIND COURIER BY ID AND THROW EXCEPTION IF NOT FOUND
+    private Courier findById(Long courierId) {
+        return courierRepo.findById(courierId)
+                .orElseThrow(() -> new ResourceNotFoundException("Courier not found"));
     }
-
-
 }
