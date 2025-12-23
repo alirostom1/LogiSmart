@@ -45,6 +45,6 @@ public class Role extends AbstractAuditableEntity {
 
     public boolean hasPermission(String permissionName) {
         return permissions.stream()
-                .anyMatch(p -> p.getName().equals(permissionName));
+                .anyMatch(p -> p.getName().name().equals(permissionName));
     }
 }
