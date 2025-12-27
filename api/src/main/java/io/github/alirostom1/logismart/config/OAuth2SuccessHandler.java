@@ -81,8 +81,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             OidcUser oidcUser = (OidcUser) principal;
             providerId = oidcUser.getSubject();
             email = oidcUser.getEmail();
-            firstName = oidcUser.getGivenName();
-            lastName = oidcUser.getFamilyName();
+            String fullName = oidcUser.getFullName();
+            int firstSpace = fullName.indexOf(" ");
+            firstName = fullName.substring(0,firstSpace);
+            lastName = fullName.substring(firstSpace + 1);
         }else{
             OAuth2User oAuth2User = (OAuth2User) principal;
             providerId = (String) oAuth2User.getAttribute("id");
