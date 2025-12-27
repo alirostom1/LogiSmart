@@ -7,16 +7,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -32,6 +27,7 @@ import java.util.List;
 public class SecurityConfig {
     private final JWTFilter jwtFilter;
     private final AuthenticationProvider authenticationProvider;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -43,6 +39,8 @@ public class SecurityConfig {
                                 "/api/v3/auth/login",
                                 "/api/v3/auth/register",
                                 "/api/v3/auth/refresh",
+                                "/api/v3/auth/google",
+                                "/api/v3/auth/google/callback",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/actuator/**"
@@ -61,8 +59,13 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(oAuth2SuccessHandler)
+                );
 
         return http.build();
     }

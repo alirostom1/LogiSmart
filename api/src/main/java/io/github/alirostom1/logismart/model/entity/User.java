@@ -1,5 +1,6 @@
 package io.github.alirostom1.logismart.model.entity;
 
+import io.github.alirostom1.logismart.model.enums.AuthProvider;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -28,15 +29,20 @@ public class User extends AbstractAuditableEntity implements UserDetails{
     @Column(nullable = false,unique = true)
     private String email;
 
-    @Column(name = "password_hash",nullable = false, columnDefinition = "TEXT")
+    @Column(name = "password_hash", columnDefinition = "TEXT")
     private String password;
 
-    @Column(nullable = false,unique = false)
+    @Column(unique = false)
     private String phone;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider = AuthProvider.GOOGLE;
+
+    private String providerId;
 
 
 
