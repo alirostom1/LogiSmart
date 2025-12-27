@@ -28,7 +28,6 @@ public class AuthConfig {
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
-
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder(12);

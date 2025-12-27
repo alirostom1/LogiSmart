@@ -5,16 +5,12 @@ import io.github.alirostom1.logismart.dto.request.RefreshRequest;
 import io.github.alirostom1.logismart.dto.request.person.RegisterRequest;
 import io.github.alirostom1.logismart.dto.response.common.AuthResponse;
 import io.github.alirostom1.logismart.dto.response.common.DefaultApiResponse;
-import io.github.alirostom1.logismart.dto.response.common.TokenPair;
-import io.github.alirostom1.logismart.model.entity.Sender;
 import io.github.alirostom1.logismart.service.AuthService;
-import io.github.alirostom1.logismart.service.JWTService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
