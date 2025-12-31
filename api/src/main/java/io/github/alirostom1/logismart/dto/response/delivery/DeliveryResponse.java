@@ -14,9 +14,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DeliveryResponse {
-    private String id;
+    private Long id;
     private String description;
     private String destinationCity;
+    private String trackingNumber;
     private double weight;
     private DeliveryStatus status;
     private DeliveryPriority priority;

@@ -87,7 +87,6 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<DefaultApiResponse<String>> handleRuntimeException(RuntimeException ex) {
-        ex.printStackTrace();
         DefaultApiResponse<String> response = new DefaultApiResponse<>(
                 false,
                 ex.getMessage(),
@@ -100,7 +99,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<DefaultApiResponse<String>> handleGenericException(Exception ex) {
-        ex.printStackTrace();
         DefaultApiResponse<String> response = new DefaultApiResponse<>(
                 false,
                 "An unexpected error occurred",

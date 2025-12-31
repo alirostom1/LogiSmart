@@ -1,178 +1,557 @@
-//package io.github.alirostom1.logismart.service;
-//
-//import io.github.alirostom1.logismart.dto.request.product.CreateProductRequest;
-//import io.github.alirostom1.logismart.dto.response.product.ProductResponse;
-//import io.github.alirostom1.logismart.exception.ProductNameAlreadyExistsException;
-//import io.github.alirostom1.logismart.exception.ResourceNotFoundException;
-//import io.github.alirostom1.logismart.mapper.ProductMapper;
-//import io.github.alirostom1.logismart.model.entity.Product;
-//import io.github.alirostom1.logismart.repository.ProductRepo;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mapstruct.factory.Mappers;
-//import org.mockito.Mock;
-//import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.PageImpl;
-//import org.springframework.data.domain.PageRequest;
-//import org.springframework.data.domain.Pageable;
-//import org.springframework.test.context.junit.jupiter.SpringExtension;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//import static org.mockito.Mockito.*;
-//
-//import java.util.List;
-//import java.util.Optional;
-//import java.util.UUID;
-//
-//@ExtendWith(SpringExtension.class)
-//public class ProductServiceUnitTest {
-//    @Mock
-//    ProductRepo productRepo;
-//
-//    ProductMapper productMapper = Mappers.getMapper(ProductMapper.class);
-//    ProductService productService;
-//
-//    @BeforeEach
-//    public void setup(){
-//        productService = new ProductService(productRepo,productMapper);
-//    }
-//
-//    //PRODUCT CREATION
-//    @Test
-//    public void createProduct_should_return_product(){
-//        CreateProductRequest request = new CreateProductRequest("product1","category1",15.0);
-//        Product mockProduct = productMapper.toEntity(request);
-//        ProductResponse mockProductResponse = productMapper.toResponse(mockProduct);
-//        when(productRepo.existsByName(request.getName())).thenReturn(false);
-//        when(productRepo.save(any(Product.class))).thenReturn(mockProduct);
-//        ProductResponse productResponse = productService.createProduct(request);
-//        assertEquals(mockProductResponse,productResponse);
-//    }
-//    @Test
-//    public void createProduct_should_throw_name_duplication_exception(){
-//        CreateProductRequest request = new CreateProductRequest("product1","category1",15.0);
-//        when(productRepo.existsByName(request.getName())).thenReturn(true);
-//        assertThrows(ProductNameAlreadyExistsException.class,() -> productService.createProduct(request));
-//    }
-//    //PRODUCT UPDATE
-//    @Test
-//    public void updateProduct_should_return_product(){
-//        UUID id = UUID.randomUUID();
-//        Product mockProduct = Product.builder().id(id).name("product1").category("category1").unitPrice(15.0).deliveryProduct(null).build();
-//        CreateProductRequest request = new CreateProductRequest("product2","category2",30.0);
-//        productMapper.updateFromRequest(request,mockProduct);
-//        ProductResponse mockProductResponse = productMapper.toResponse(mockProduct);
-//        when(productRepo.existsByNameAndIdNot(request.getName(),id)).thenReturn(false);
-//        when(productRepo.findById(id)).thenReturn(Optional.of(mockProduct));
-//        when(productRepo.save(any(Product.class))).thenReturn(mockProduct);
-//        ProductResponse productResponse = productService.updateProduct(id.toString(),request);
-//        assertEquals(mockProductResponse,productResponse);
-//    }
-//    @Test
-//    public void updateProduct_should_throw_name_duplication_exception(){
-//        UUID id = UUID.randomUUID();
-//        CreateProductRequest request = new CreateProductRequest("product2","category2",30.0);
-//        Product mockProduct = productMapper.toEntity(request);
-//        when(productRepo.findById(id)).thenReturn(Optional.of(mockProduct));
-//        when(productRepo.existsByNameAndIdNot(request.getName(),id)).thenReturn(true);
-//        assertThrows(ProductNameAlreadyExistsException.class,() -> productService.updateProduct(id.toString(),request));
-//    }
-//    @Test
-//    public void updateProduct_should_throw_not_found_exception(){
-//        UUID id = UUID.randomUUID();
-//        CreateProductRequest request = new CreateProductRequest("product2","category2",30.0);
-//        Product mockProduct = productMapper.toEntity(request);
-//        when(productRepo.findById(id)).thenReturn(Optional.empty());
-//        Exception ex = assertThrows(ResourceNotFoundException.class,() -> productService.updateProduct(id.toString(),request));
-//        assertTrue(ex.getMessage().contains("Product not found"));
-//    }
-//
-//    //PRODUCT RETRIEVAL
-//    @Test
-//    public void getProductById_should_return_product(){
-//        UUID id = UUID.randomUUID();
-//        Product mockProduct = Product.builder().id(id).name("product1").category("category1").unitPrice(15.0).deliveryProduct(null).build();
-//        ProductResponse mockResponse = productMapper.toResponse(mockProduct);
-//        when(productRepo.findById(id)).thenReturn(Optional.of(mockProduct));
-//        ProductResponse productResponse = productService.getProductById(id.toString());
-//        assertEquals(mockResponse,productResponse);
-//    }
-//    @Test
-//    public void getProductById_should_throw_not_found_exception(){
-//        UUID id = UUID.randomUUID();
-//        when(productRepo.findById(id)).thenReturn(Optional.empty());
-//        Exception ex = assertThrows(ResourceNotFoundException.class,() -> productService.getProductById(id.toString()));
-//        assertTrue(ex.getMessage().contains("Product not found"));
-//    }
-//
-//    //PRODUCTS RETRIEVAL
-//    @Test
-//    public void getAllProducts_should_return_products(){
-//        Product mockProduct1 = Product.builder().id(UUID.randomUUID()).name("product1").category("category1").unitPrice(15.0).deliveryProduct(null).build();
-//        Product mockProduct2 = Product.builder().id(UUID.randomUUID()).name("product2").category("category2").unitPrice(30.0).deliveryProduct(null).build();
-//        Pageable pageRequest = PageRequest.of(0,10);
-//        Page<Product> mockProductPage = new PageImpl<>(
-//                List.of(mockProduct1,mockProduct2)
-//                ,pageRequest
-//                ,2
-//        );
-//        Page<ProductResponse> mockResponse = mockProductPage.map(productMapper::toResponse);
-//        when(productRepo.findAll(pageRequest)).thenReturn(mockProductPage);
-//        Page<ProductResponse> responsePage = productService.getAllProducts(pageRequest);
-//        assertEquals(mockResponse,responsePage);
-//    }
-//    //PRODUCTS SEARCH
-//    @Test
-//    public void searchProducts_should_return_products(){
-//        String searchTerm = "Product 2";
-//        Product mockProduct1 = Product.builder().id(UUID.randomUUID()).name("product1").category("category1").unitPrice(15.0).deliveryProduct(null).build();
-//        Product mockProduct2 = Product.builder().id(UUID.randomUUID()).name("product2").category("category2").unitPrice(30.0).deliveryProduct(null).build();
-//        Pageable pageRequest = PageRequest.of(0,10);
-//        Page<Product> mockProductPage = new PageImpl<>(
-//                List.of(mockProduct1),
-//                pageRequest,
-//                1
-//        );
-//        Page<ProductResponse> mockResponsePage = mockProductPage.map(productMapper::toResponse);
-//        when(productRepo.findByNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(searchTerm,searchTerm,pageRequest)).thenReturn(mockProductPage);
-//        Page<ProductResponse> responsePage = productService.searchProducts(searchTerm,pageRequest);
-//        assertEquals(mockResponsePage,responsePage);
-//    }
-//    @Test
-//    public void getProductsByCategory_should_return_products() {
-//        String category = "Category1";
-//        Product mockProduct1 = Product.builder().id(UUID.randomUUID()).name("product1").category("category1").unitPrice(15.0).deliveryProduct(null).build();
-//        Product mockProduct2 = Product.builder().id(UUID.randomUUID()).name("product2").category("category2").unitPrice(30.0).deliveryProduct(null).build();
-//
-//        Pageable pageRequest = PageRequest.of(0, 10);
-//        Page<Product> mockProductPage = new PageImpl<>(
-//                List.of(mockProduct1, mockProduct2), pageRequest, 2
-//        );
-//        Page<ProductResponse> expectedResponsePage = mockProductPage.map(productMapper::toResponse);
-//
-//        when(productRepo.findByCategoryContainingIgnoreCase(category, pageRequest)).thenReturn(mockProductPage);
-//
-//        Page<ProductResponse> responsePage = productService.getProductsByCategory(category, pageRequest);
-//
-//        assertEquals(expectedResponsePage, responsePage);
-//    }
-//    @Test
-//    public void deleteProduct_should_delete_when_exists() {
-//        UUID productId = UUID.randomUUID();
-//        when(productRepo.existsById(productId)).thenReturn(true);
-//
-//        productService.deleteProduct(productId.toString());
-//
-//        verify(productRepo, times(1)).deleteById(productId);
-//    }
-//    @Test
-//    public void deleteProduct_should_throw_when_not_exists() {
-//        UUID productId = UUID.randomUUID();
-//        when(productRepo.existsById(productId)).thenReturn(false);
-//
-//        Exception ex = assertThrows(ResourceNotFoundException.class, () -> productService.deleteProduct(productId.toString()));
-//        assertTrue(ex.getMessage().contains("Product"));
-//        assertTrue(ex.getMessage().contains(productId.toString()));
-//    }
-//}
+package io.github.alirostom1.logismart.service;
+
+import io.github.alirostom1.logismart.dto.request.product.CreateProductRequest;
+import io.github.alirostom1.logismart.dto.response.product.ProductResponse;
+import io.github.alirostom1.logismart.exception.ProductNameAlreadyExistsException;
+import io.github.alirostom1.logismart.exception.ResourceNotFoundException;
+import io.github.alirostom1.logismart.exception.UnownedRessourceException;
+import io.github.alirostom1.logismart.mapper.ProductMapper;
+import io.github.alirostom1.logismart.model.entity.Product;
+import io.github.alirostom1.logismart.model.entity.Sender;
+import io.github.alirostom1.logismart.repository.ProductRepo;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("ProductService Unit Tests")
+class ProductServiceUnitTest {
+
+    @Mock
+    private ProductRepo productRepo;
+
+    @Mock
+    private ProductMapper productMapper;
+
+    @InjectMocks
+    private ProductService productService;
+
+    // Test entities
+    private Product product;
+    private Sender sender;
+    private CreateProductRequest createRequest;
+    private ProductResponse productResponse;
+
+    @BeforeEach
+    void setUp() {
+        // Setup Sender
+        sender = new Sender();
+        sender.setId(1L);
+        sender.setFirstName("Test");
+        sender.setLastName("Sender");
+        sender.setEmail("sender@test.com");
+
+        // Setup Product
+        product = new Product();
+        product.setId(1L);
+        product.setName("Test Product");
+        product.setCategory("Electronics");
+        product.setUnitPrice(BigDecimal.valueOf(99.99));
+        product.setSender(sender);
+
+        // Setup CreateProductRequest
+        createRequest = new CreateProductRequest();
+        createRequest.setName("Test Product");
+        createRequest.setCategory("Electronics");
+        createRequest.setUnitPrice(BigDecimal.valueOf(99.99));
+
+        // Setup ProductResponse
+        productResponse = new ProductResponse();
+        productResponse.setId(1L);
+        productResponse.setName("Test Product");
+        productResponse.setCategory("Electronics");
+        productResponse.setUnitPrice(BigDecimal.valueOf(99.99));
+    }
+
+    // ==================== CREATE PRODUCT TESTS ====================
+
+    @Nested
+    @DisplayName("createProduct()")
+    class CreateProductTests {
+
+        @Test
+        @DisplayName("Should create product successfully")
+        void shouldCreateProductSuccessfully() {
+            // Given
+            when(productRepo.existsByNameAndSenderId("Test Product", 1L)).thenReturn(false);
+            when(productMapper.toEntity(any(CreateProductRequest.class))).thenReturn(product);
+            when(productRepo.save(any(Product.class))).thenReturn(product);
+            when(productMapper.toResponse(any(Product.class))).thenReturn(productResponse);
+
+            // When
+            ProductResponse result = productService.createProduct(createRequest, 1L);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getId()).isEqualTo(1L);
+            assertThat(result.getName()).isEqualTo("Test Product");
+
+            verify(productRepo).existsByNameAndSenderId("Test Product", 1L);
+            verify(productRepo).save(any(Product.class));
+        }
+
+        @Test
+        @DisplayName("Should throw ProductNameAlreadyExistsException when name exists for sender")
+        void shouldThrowExceptionWhenProductNameExistsForSender() {
+            // Given
+            when(productRepo.existsByNameAndSenderId("Test Product", 1L)).thenReturn(true);
+
+            // When & Then
+            assertThatThrownBy(() -> productService.createProduct(createRequest, 1L))
+                    .isInstanceOf(ProductNameAlreadyExistsException.class);
+
+            verify(productRepo, never()).save(any());
+        }
+    }
+
+    // ==================== GET PRODUCT BY ID SUPER TESTS ====================
+
+    @Nested
+    @DisplayName("getProductByIdSuper()")
+    class GetProductByIdSuperTests {
+
+        @Test
+        @DisplayName("Should return product when found (manager access)")
+        void shouldReturnProductWhenFound() {
+            // Given
+            when(productRepo.findById(1L)).thenReturn(Optional.of(product));
+            when(productMapper.toResponse(product)).thenReturn(productResponse);
+
+            // When
+            ProductResponse result = productService.getProductByIdSuper(1L);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getId()).isEqualTo(1L);
+            verify(productRepo).findById(1L);
+        }
+
+        @Test
+        @DisplayName("Should throw ResourceNotFoundException when product not found")
+        void shouldThrowExceptionWhenProductNotFound() {
+            // Given
+            when(productRepo.findById(1L)).thenReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> productService.getProductByIdSuper(1L))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("Product not found");
+        }
+    }
+
+    // ==================== GET PRODUCT BY ID (SENDER) TESTS ====================
+
+    @Nested
+    @DisplayName("getProductById()")
+    class GetProductByIdTests {
+
+        @Test
+        @DisplayName("Should return product when sender owns it")
+        void shouldReturnProductWhenSenderOwnsIt() {
+            // Given
+            when(productRepo.findById(1L)).thenReturn(Optional.of(product));
+            when(productMapper.toResponse(product)).thenReturn(productResponse);
+
+            // When
+            ProductResponse result = productService.getProductById(1L, 1L);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getId()).isEqualTo(1L);
+        }
+
+        @Test
+        @DisplayName("Should throw UnownedRessourceException when sender doesn't own product")
+        void shouldThrowExceptionWhenSenderDoesntOwnProduct() {
+            // Given
+            when(productRepo.findById(1L)).thenReturn(Optional.of(product));
+
+            // When & Then
+            assertThatThrownBy(() -> productService.getProductById(1L, 999L))
+                    .isInstanceOf(UnownedRessourceException.class)
+                    .hasMessage("You don't own this product!");
+        }
+
+        @Test
+        @DisplayName("Should throw ResourceNotFoundException when product not found")
+        void shouldThrowExceptionWhenProductNotFound() {
+            // Given
+            when(productRepo.findById(1L)).thenReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> productService.getProductById(1L, 1L))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("Product not found");
+        }
+    }
+
+    // ==================== GET MY PRODUCTS TESTS ====================
+
+    @Nested
+    @DisplayName("getMyProducts()")
+    class GetMyProductsTests {
+
+        @Test
+        @DisplayName("Should return sender's products")
+        void shouldReturnSendersProducts() {
+            // Given
+            Pageable pageable = PageRequest.of(0, 10);
+            List<Product> productList = List.of(product);
+            Page<Product> productPage = new PageImpl<>(productList, pageable, 1);
+
+            when(productRepo.findBySenderId(1L, pageable)).thenReturn(productPage);
+            when(productMapper.toResponse(any(Product.class))).thenReturn(productResponse);
+
+            // When
+            Page<ProductResponse> result = productService.getMyProducts(1L, pageable);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getContent()).hasSize(1);
+            verify(productRepo).findBySenderId(1L, pageable);
+        }
+
+        @Test
+        @DisplayName("Should return empty page when sender has no products")
+        void shouldReturnEmptyPageWhenNoProducts() {
+            // Given
+            Pageable pageable = PageRequest.of(0, 10);
+            Page<Product> emptyPage = new PageImpl<>(List.of(), pageable, 0);
+
+            when(productRepo.findBySenderId(1L, pageable)).thenReturn(emptyPage);
+
+            // When
+            Page<ProductResponse> result = productService.getMyProducts(1L, pageable);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getContent()).isEmpty();
+        }
+    }
+
+    // ==================== GET ALL PRODUCTS TESTS ====================
+
+    @Nested
+    @DisplayName("getAllProducts()")
+    class GetAllProductsTests {
+
+        @Test
+        @DisplayName("Should return all products paginated")
+        void shouldReturnAllProductsPaginated() {
+            // Given
+            Pageable pageable = PageRequest.of(0, 10);
+            List<Product> productList = List.of(product);
+            Page<Product> productPage = new PageImpl<>(productList, pageable, 1);
+
+            when(productRepo.findAll(pageable)).thenReturn(productPage);
+            when(productMapper.toResponse(any(Product.class))).thenReturn(productResponse);
+
+            // When
+            Page<ProductResponse> result = productService.getAllProducts(pageable);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getContent()).hasSize(1);
+            assertThat(result.getTotalElements()).isEqualTo(1);
+            verify(productRepo).findAll(pageable);
+        }
+
+        @Test
+        @DisplayName("Should return empty page when no products exist")
+        void shouldReturnEmptyPageWhenNoProductsExist() {
+            // Given
+            Pageable pageable = PageRequest.of(0, 10);
+            Page<Product> emptyPage = new PageImpl<>(List.of(), pageable, 0);
+
+            when(productRepo.findAll(pageable)).thenReturn(emptyPage);
+
+            // When
+            Page<ProductResponse> result = productService.getAllProducts(pageable);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getContent()).isEmpty();
+            assertThat(result.getTotalElements()).isZero();
+        }
+    }
+
+    // ==================== SEARCH PRODUCTS TESTS ====================
+
+    @Nested
+    @DisplayName("searchProducts()")
+    class SearchProductsTests {
+
+        @Test
+        @DisplayName("Should return products matching search term")
+        void shouldReturnProductsMatchingSearchTerm() {
+            // Given
+            Pageable pageable = PageRequest.of(0, 10);
+            String searchTerm = "Test";
+            List<Product> productList = List.of(product);
+            Page<Product> productPage = new PageImpl<>(productList, pageable, 1);
+
+            when(productRepo.findByNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(
+                    searchTerm, searchTerm, pageable)).thenReturn(productPage);
+            when(productMapper.toResponse(any(Product.class))).thenReturn(productResponse);
+
+            // When
+            Page<ProductResponse> result = productService.searchProducts(searchTerm, pageable);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getContent()).hasSize(1);
+            verify(productRepo).findByNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(
+                    searchTerm, searchTerm, pageable);
+        }
+
+        @Test
+        @DisplayName("Should return empty page when no products match search")
+        void shouldReturnEmptyPageWhenNoMatch() {
+            // Given
+            Pageable pageable = PageRequest.of(0, 10);
+            String searchTerm = "NonExistent";
+            Page<Product> emptyPage = new PageImpl<>(List.of(), pageable, 0);
+
+            when(productRepo.findByNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(
+                    searchTerm, searchTerm, pageable)).thenReturn(emptyPage);
+
+            // When
+            Page<ProductResponse> result = productService.searchProducts(searchTerm, pageable);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getContent()).isEmpty();
+        }
+    }
+
+    // ==================== GET PRODUCTS BY CATEGORY TESTS ====================
+
+    @Nested
+    @DisplayName("getProductsByCategory()")
+    class GetProductsByCategoryTests {
+
+        @Test
+        @DisplayName("Should return products in category")
+        void shouldReturnProductsInCategory() {
+            // Given
+            Pageable pageable = PageRequest.of(0, 10);
+            String category = "Electronics";
+            List<Product> productList = List.of(product);
+            Page<Product> productPage = new PageImpl<>(productList, pageable, 1);
+
+            when(productRepo.findByCategoryContainingIgnoreCase(category, pageable)).thenReturn(productPage);
+            when(productMapper.toResponse(any(Product.class))).thenReturn(productResponse);
+
+            // When
+            Page<ProductResponse> result = productService.getProductsByCategory(category, pageable);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getContent()).hasSize(1);
+            verify(productRepo).findByCategoryContainingIgnoreCase(category, pageable);
+        }
+
+        @Test
+        @DisplayName("Should return empty page when no products in category")
+        void shouldReturnEmptyPageWhenNoCategoryMatch() {
+            // Given
+            Pageable pageable = PageRequest.of(0, 10);
+            String category = "NonExistentCategory";
+            Page<Product> emptyPage = new PageImpl<>(List.of(), pageable, 0);
+
+            when(productRepo.findByCategoryContainingIgnoreCase(category, pageable)).thenReturn(emptyPage);
+
+            // When
+            Page<ProductResponse> result = productService.getProductsByCategory(category, pageable);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getContent()).isEmpty();
+        }
+    }
+
+    // ==================== UPDATE PRODUCT TESTS ====================
+
+    @Nested
+    @DisplayName("updateProduct()")
+    class UpdateProductTests {
+
+        @Test
+        @DisplayName("Should update product successfully")
+        void shouldUpdateProductSuccessfully() {
+            // Given
+            CreateProductRequest updateRequest = new CreateProductRequest();
+            updateRequest.setName("Updated Product");
+            updateRequest.setCategory("Updated Category");
+            updateRequest.setUnitPrice(BigDecimal.valueOf(149.99));
+
+            ProductResponse updatedResponse = new ProductResponse();
+            updatedResponse.setId(1L);
+            updatedResponse.setName("Updated Product");
+
+            when(productRepo.findById(1L)).thenReturn(Optional.of(product));
+            when(productRepo.existsByNameAndIdNotAndSenderId("Updated Product", 1L, 1L)).thenReturn(false);
+            when(productRepo.save(any(Product.class))).thenReturn(product);
+            when(productMapper.toResponse(any(Product.class))).thenReturn(updatedResponse);
+
+            // When
+            ProductResponse result = productService.updateProduct(1L, updateRequest, 1L);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getName()).isEqualTo("Updated Product");
+
+            verify(productMapper).updateFromRequest(updateRequest, product);
+            verify(productRepo).save(product);
+        }
+
+        @Test
+        @DisplayName("Should throw UnownedRessourceException when sender doesn't own product")
+        void shouldThrowExceptionWhenSenderDoesntOwnProduct() {
+            // Given
+            when(productRepo.findById(1L)).thenReturn(Optional.of(product));
+
+            // When & Then
+            assertThatThrownBy(() -> productService.updateProduct(1L, createRequest, 999L))
+                    .isInstanceOf(UnownedRessourceException.class)
+                    .hasMessage("You don't have permission!");
+
+            verify(productRepo, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("Should throw ProductNameAlreadyExistsException when name exists for another product")
+        void shouldThrowExceptionWhenNameExistsForAnotherProduct() {
+            // Given
+            when(productRepo.findById(1L)).thenReturn(Optional.of(product));
+            when(productRepo.existsByNameAndIdNotAndSenderId("Test Product", 1L, 1L)).thenReturn(true);
+
+            // When & Then
+            assertThatThrownBy(() -> productService.updateProduct(1L, createRequest, 1L))
+                    .isInstanceOf(ProductNameAlreadyExistsException.class);
+
+            verify(productRepo, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("Should throw ResourceNotFoundException when product not found")
+        void shouldThrowExceptionWhenProductNotFound() {
+            // Given
+            when(productRepo.findById(1L)).thenReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> productService.updateProduct(1L, createRequest, 1L))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("Product not found");
+
+            verify(productRepo, never()).save(any());
+        }
+    }
+
+    // ==================== DELETE PRODUCT SUPER TESTS ====================
+
+    @Nested
+    @DisplayName("deleteProductSuper()")
+    class DeleteProductSuperTests {
+
+        @Test
+        @DisplayName("Should delete product successfully (manager access)")
+        void shouldDeleteProductSuccessfully() {
+            // Given
+            when(productRepo.existsById(1L)).thenReturn(true);
+            doNothing().when(productRepo).deleteById(1L);
+
+            // When
+            productService.deleteProductSuper(1L);
+
+            // Then
+            verify(productRepo).existsById(1L);
+            verify(productRepo).deleteById(1L);
+        }
+
+        @Test
+        @DisplayName("Should throw ResourceNotFoundException when product not found")
+        void shouldThrowExceptionWhenProductNotFound() {
+            // Given
+            when(productRepo.existsById(1L)).thenReturn(false);
+
+            // When & Then
+            assertThatThrownBy(() -> productService.deleteProductSuper(1L))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("Product not found");
+
+            verify(productRepo, never()).deleteById(anyLong());
+        }
+    }
+
+    // ==================== DELETE PRODUCT (SENDER) TESTS ====================
+
+    @Nested
+    @DisplayName("deleteProduct()")
+    class DeleteProductTests {
+
+        @Test
+        @DisplayName("Should delete product when sender owns it")
+        void shouldDeleteProductWhenSenderOwnsIt() {
+            // Given
+            when(productRepo.existsByIdAndSenderId(1L, 1L)).thenReturn(true);
+            doNothing().when(productRepo).deleteById(1L);
+
+            // When
+            productService.deleteProduct(1L, 1L);
+
+            // Then
+            verify(productRepo).existsByIdAndSenderId(1L, 1L);
+            verify(productRepo).deleteById(1L);
+        }
+
+        @Test
+        @DisplayName("Should throw ResourceNotFoundException when product not found or not owned")
+        void shouldThrowExceptionWhenProductNotFoundOrNotOwned() {
+            // Given
+            when(productRepo.existsByIdAndSenderId(1L, 1L)).thenReturn(false);
+
+            // When & Then
+            assertThatThrownBy(() -> productService.deleteProduct(1L, 1L))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("Product not found");
+
+            verify(productRepo, never()).deleteById(anyLong());
+        }
+
+        @Test
+        @DisplayName("Should throw ResourceNotFoundException when sender doesn't own product")
+        void shouldThrowExceptionWhenSenderDoesntOwnProduct() {
+            // Given
+            when(productRepo.existsByIdAndSenderId(1L, 999L)).thenReturn(false);
+
+            // When & Then
+            assertThatThrownBy(() -> productService.deleteProduct(1L, 999L))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("Product not found");
+
+            verify(productRepo, never()).deleteById(anyLong());
+        }
+    }
+}
