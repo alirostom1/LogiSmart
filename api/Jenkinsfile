@@ -15,7 +15,6 @@ pipeline {
         DOCKER_REGISTRY = credentials('DOCKER_REGISTRY')
         APP_NAME = 'logismart'
     }
-
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
         timestamps()
