@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CourierWithDeliveriesResponse {
-    private String id;
+    private Long id;
     private String lastName;
     private String firstName;
     private String vehicle;

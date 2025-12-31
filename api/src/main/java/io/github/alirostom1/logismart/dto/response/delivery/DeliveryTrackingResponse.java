@@ -16,6 +16,7 @@ public class DeliveryTrackingResponse {
     private String id;
     private String description;
     private DeliveryStatus currentStatus;
+    private String trackingNumber;
     private String destinationCity;
     private String recipientName;
     private String senderName;

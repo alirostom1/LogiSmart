@@ -13,10 +13,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CourierResponse {
-    private String id;
+    private Long id;
     private String lastName;
     private String firstName;
     private String vehicle;
+    private String email;
     private String phoneNumber;
     private ZoneResponse zone;
     private LocalDateTime createdAt;

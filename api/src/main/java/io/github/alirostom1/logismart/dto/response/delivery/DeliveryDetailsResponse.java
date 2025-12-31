@@ -23,12 +23,13 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DeliveryDetailsResponse {
-    private String id;
+    private Long id;
     private String description;
     private String destinationCity;
     private double weight;
     private String status;
     private String priority;
+    private String trackingNumber;
     private SenderResponse sender;
     private RecipientResponse recipient;
     private CourierResponse collectingCourier;
