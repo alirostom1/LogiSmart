@@ -13,7 +13,7 @@ pipeline {
         SONAR_HOST_URL = credentials('SONAR_HOST_URL')
         SONAR_TOKEN = credentials('SONAR_TOKEN')
         DOCKER_REGISTRY = credentials('DOCKER_REGISTRY')
-        APP_NAME = 'logismart'
+        APP_NAME = 'LogiSmart'
     }
 
 
