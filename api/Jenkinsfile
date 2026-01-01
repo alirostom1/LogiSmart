@@ -75,13 +75,14 @@ pipeline {
                         def image = docker.build("${DOCKER_REGISTRY}/${APP_NAME}:${BUILD_NUMBER}")
                         docker.build("${DOCKER_REGISTRY}/${APP_NAME}:latest")
 
-                        docker.withRegistry("https://${DOCKER_REGISTRY}", 'DOCKER_CREDENTIALS') {
+                        docker.withRegistry("https://hub.docker.com/repositories/${DOCKER_REGISTRY}", 'DOCKER_CREDENTIALS') {
                             image.push()
                             image.push('latest')
                         }
                     }
                 }
             }
+
             post {
                 always {
                     sh "docker rmi ${DOCKER_REGISTRY}/${APP_NAME}:${BUILD_NUMBER} || true"
