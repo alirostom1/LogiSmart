@@ -1,21 +1,4 @@
-# Build stage
-FROM maven:3.9.6-eclipse-temurin-17-alpine AS builder
-
-WORKDIR /app
-
-# Copy pom.xml first for better layer caching
-COPY pom.xml .
-
-# Download dependencies (this layer will be cached if pom.xml doesn't change)
-RUN mvn dependency:go-offline -B
-
-# Copy source code
-COPY src ./src
-
-# Build the application (skip tests for faster build)
-RUN mvn clean package -Dmaven.test.skip=true -B
-
-# Production stage
+# Production stage only - JAR already built by Maven in pipeline
 FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
@@ -26,8 +9,8 @@ RUN apk add --no-cache wget
 # Create non-root user
 RUN addgroup -S spring && adduser -S spring -G spring
 
-# Copy the built jar from builder stage
-COPY --from=builder /app/target/*.jar app.jar
+# Copy the pre-built jar from target directory
+COPY target/*.jar app.jar
 
 # Create logs directory with proper permissions
 RUN mkdir -p logs && \
@@ -40,9 +23,9 @@ USER spring:spring
 # Expose port
 EXPOSE 8080
 
-# Health check - check if port is responding
+# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/api/v3/auth/login || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
 
 # JVM optimizations for container
 ENTRYPOINT ["java", \
