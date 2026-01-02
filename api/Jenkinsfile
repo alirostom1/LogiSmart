@@ -29,6 +29,14 @@ pipeline {
 
 
     stages {
+        stage('Debug') {
+            steps {
+                sh '''
+                    echo "DOCKER_REGISTRY value: ${DOCKER_REGISTRY}"
+                    echo "Full image name: ${DOCKER_REGISTRY}/logismart:${BUILD_NUMBER}"
+                '''
+            }
+        }
         stage('Build & Test') {
             steps {
                 dir('api') {
