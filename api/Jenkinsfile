@@ -72,7 +72,7 @@ pipeline {
             steps {
                 dir('api') {
                     script {
-                        def imageName = "alirostom220/${APP_NAME}"
+                        def imageName = "${DOCKER_REGISTRY}/${APP_NAME}"
                         def image = docker.build("${imageName}:${BUILD_NUMBER}")
 
                         docker.withRegistry('https://docker.io', 'DOCKER_CREDENTIALS') {
@@ -82,6 +82,8 @@ pipeline {
                     }
                 }
             }
+
+
 
 
             post {
