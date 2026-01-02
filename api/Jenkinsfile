@@ -86,6 +86,7 @@ pipeline {
 
 
 
+
             post {
                 always {
                     sh "docker rmi ${DOCKER_REGISTRY}/${APP_NAME}:${BUILD_NUMBER} || true"
