@@ -18,6 +18,8 @@ API REST sécurisée pour la gestion complète du cycle logistique : collecte, s
 
 ## 🔐 Sécurité Implémentée
 
+
+
 ### Authentification JWT Stateless
 - ✅ Endpoint `/api/v3/auth/login` - Authentification
 - ✅ Endpoint `/api/v3/auth/register` - Inscription (Clients)
