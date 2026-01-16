@@ -86,5 +86,6 @@ public class Delivery extends AbstractAuditableEntity{
     private String shippingPostalCode;
 
     @OneToMany(mappedBy = "delivery", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<DeliveryHistory> deliveryHistoryList = new ArrayList<>();
 }

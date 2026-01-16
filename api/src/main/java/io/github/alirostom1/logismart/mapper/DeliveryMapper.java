@@ -6,8 +6,10 @@ import io.github.alirostom1.logismart.dto.response.delivery.DeliveryResponse;
 import io.github.alirostom1.logismart.dto.response.delivery.DeliveryDetailsResponse;
 import io.github.alirostom1.logismart.dto.response.delivery.DeliveryTrackingResponse;
 import io.github.alirostom1.logismart.model.entity.Delivery;
+import io.github.alirostom1.logismart.model.enums.DeliveryPriority;
 import org.mapstruct.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Mapper(componentModel = "spring",
@@ -54,6 +56,8 @@ public interface DeliveryMapper {
     // REQUEST MAPPING
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "status", constant = "CREATED")
+    @Mapping(target = "priority", source = "priority", qualifiedByName = "stringToPriority")
+    @Mapping(target = "weightKg", source = "weight", qualifiedByName = "doubleToBigDecimal")
     @Mapping(target = "sender", ignore = true)
     @Mapping(target = "recipient", ignore = true)
     @Mapping(target = "pickupZone", ignore = true)
@@ -64,5 +68,23 @@ public interface DeliveryMapper {
     @Mapping(target = "deliveryHistoryList", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "trackingNumber", ignore = true)
     Delivery toEntity(CreateDeliveryRequest request);
+
+    @Named("stringToPriority")
+    default DeliveryPriority stringToPriority(String priority) {
+        if (priority == null || priority.isBlank()) {
+            return DeliveryPriority.MEDIUM;
+        }
+        try {
+            return DeliveryPriority.valueOf(priority.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return DeliveryPriority.MEDIUM;
+        }
+    }
+
+    @Named("doubleToBigDecimal")
+    default BigDecimal doubleToBigDecimal(Double value) {
+        return value != null ? BigDecimal.valueOf(value) : BigDecimal.ZERO;
+    }
 }

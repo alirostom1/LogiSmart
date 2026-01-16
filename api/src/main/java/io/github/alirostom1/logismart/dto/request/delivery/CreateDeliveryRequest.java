@@ -17,8 +17,6 @@ public class CreateDeliveryRequest {
     @NotBlank(message = "Description is required")
     private String description;
 
-    @NotBlank(message = "Destination city is required")
-    private String destinationCity;
 
     @NotNull(message = "Weight is required")
     @Positive(message = "Weight must be positive")

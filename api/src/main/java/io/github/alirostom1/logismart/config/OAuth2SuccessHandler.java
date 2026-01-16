@@ -21,6 +21,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -29,6 +30,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Optional;
 
 @Component
@@ -39,6 +41,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final UserRepo userRepo;
     private final RoleRepository roleRepo;
     private final PersonMapper personMapper;
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -64,11 +68,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         mapper.registerModule(new JavaTimeModule());
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,false);
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.setStatus(HttpServletResponse.SC_OK);
+
         String jsonResponse = mapper.writeValueAsString(apiResponse);
-        response.getWriter().write(jsonResponse);
+        String encodedResponse = URLEncoder.encode(jsonResponse,"UTF-8");
+        String redirectUrl = String.format("%s/auth/callback#response=%s",frontendUrl,encodedResponse);
+        response.sendRedirect(redirectUrl);
     }
 
     private User getOrCreateUser(AuthProvider provider,Object principal){

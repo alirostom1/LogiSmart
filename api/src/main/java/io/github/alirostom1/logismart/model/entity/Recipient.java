@@ -26,5 +26,6 @@ public class Recipient extends AbstractAuditableEntity{
     private String email;
 
     @OneToMany(mappedBy = "recipient", fetch = FetchType.EAGER)
+    @Builder.Default
     private List<Delivery> deliveries = new ArrayList<>();
 }

@@ -31,11 +31,11 @@ public class ZoneService {
 
     @Transactional(readOnly = true)
     public ZoneResponse getZoneByPostalCode(String postalCode) {
-        Zone zone = zonePostalCodeRepo.findZoneByPostalCode(postalCode.strip())
+        ZonePostalCode zone = zonePostalCodeRepo.findZoneByPostalCode(postalCode.strip())
                 .orElseThrow(() -> new ZoneNotServicedException(
                         "Sorry, we don't deliver to postal code: " + postalCode
                 ));
-        return zoneMapper.toResponse(zone);
+        return zoneMapper.toResponse(zone.getZone());
     }
 
     public void validateDeliveryZones(Zone pickupZone, Zone deliveryZone) {

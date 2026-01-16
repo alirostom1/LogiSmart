@@ -52,10 +52,13 @@ public class DeliveryService {
         Recipient recipient = recipientService.findOrCreateRecipient(request.getRecipientData());
 
         //GET ZONE
-        Zone pickupZone = zonePostalCodeRepo.findZoneByPostalCode(request.getPickupPostalCode())
+        ZonePostalCode pickupZonePC = zonePostalCodeRepo.findZoneByPostalCode(request.getPickupPostalCode())
                 .orElseThrow(() -> new ZoneNotServicedException("Pickup zone not available"));
-        Zone shippingZone = zonePostalCodeRepo.findZoneByPostalCode(request.getShippingPostalCode())
+        ZonePostalCode shippingZonePC = zonePostalCodeRepo.findZoneByPostalCode(request.getShippingPostalCode())
                 .orElseThrow(() -> new ZoneNotServicedException("Shipping zone not available"));
+
+        Zone pickupZone = shippingZonePC.getZone();
+        Zone shippingZone = shippingZonePC.getZone();
 
         //VALIDATE IF BOTH ZONES ARE ACTIVE
         zoneService.validateDeliveryZones(pickupZone,shippingZone);
@@ -66,6 +69,9 @@ public class DeliveryService {
         delivery.setRecipient(recipient);
         delivery.setPickupZone(pickupZone);
         delivery.setShippingZone(shippingZone);
+        
+        // GENERATE TRACKING NUMBER
+        delivery.setTrackingNumber(generateTrackingNumber(shippingZone));
 
         //SAVE DELIVERY
         Delivery savedDelivery = deliveryRepo.save(delivery);
@@ -264,5 +270,14 @@ public class DeliveryService {
             deliveryProducts.add(deliveryProduct);
         }
         return deliveryProductRepo.saveAll(deliveryProducts);
+    }
+
+    // GENERATE TRACKING NUMBER
+    private String generateTrackingNumber(Zone shippingZone) {
+        String zoneCode = shippingZone.getCode() != null && !shippingZone.getCode().isBlank() 
+            ? shippingZone.getCode() 
+            : "LS";
+        String uniqueId = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        return zoneCode + "-" + uniqueId;
     }
 }

@@ -25,7 +25,6 @@ public class SearchDeliveryRequest {
 
     private Long deliveryZoneId;
 
-    @NotBlank
     private String city;
 
     @ValidUUID

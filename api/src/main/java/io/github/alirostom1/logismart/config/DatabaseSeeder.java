@@ -4,6 +4,7 @@ import io.github.alirostom1.logismart.model.entity.*;
 import io.github.alirostom1.logismart.model.enums.EPermission;
 import io.github.alirostom1.logismart.model.enums.ERole;
 import io.github.alirostom1.logismart.repository.*;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ public class DatabaseSeeder {
     private final SenderRepo senderRepo;
     private final ZoneRepo zoneRepo;
     private final ZonePostalCodeRepo zonePostalCodeRepo;
+    private final ProductRepo productRepo;
     private final PasswordEncoder passwordEncoder;
 
     @Bean
@@ -37,6 +39,7 @@ public class DatabaseSeeder {
             assignPermissionsToRoles();
             seedZones();
             seedTestUsers();
+            seedProducts();
         };
     }
 
@@ -301,6 +304,84 @@ public class DatabaseSeeder {
                 senderRepo.save(sender2);
             }
         }
+    }
+
+    @Transactional
+    protected void seedProducts() {
+        if (productRepo.count() > 0) {
+            return; // Products already exist
+        }
+
+        // Get senders to assign products to
+        List<Sender> senders = senderRepo.findAll();
+        if (senders.isEmpty()) {
+            return; // No senders available
+        }
+
+        Sender sender1 = senders.get(0);
+        Sender sender2 = senders.size() > 1 ? senders.get(1) : sender1;
+
+        // Products for sender1
+        List<Product> products = new ArrayList<>();
+        
+        products.add(Product.builder()
+                .name("Livre")
+                .slug("livre")
+                .category("Documents")
+                .unitPrice(new java.math.BigDecimal("5.00"))
+                .sender(sender1)
+                .build());
+
+        products.add(Product.builder()
+                .name("Colis Standard")
+                .slug("colis-standard")
+                .category("Colis")
+                .unitPrice(new java.math.BigDecimal("10.00"))
+                .sender(sender1)
+                .build());
+
+        products.add(Product.builder()
+                .name("Colis Fragile")
+                .slug("colis-fragile")
+                .category("Colis")
+                .unitPrice(new java.math.BigDecimal("15.00"))
+                .sender(sender1)
+                .build());
+
+        products.add(Product.builder()
+                .name("Enveloppe")
+                .slug("enveloppe")
+                .category("Documents")
+                .unitPrice(new java.math.BigDecimal("3.00"))
+                .sender(sender1)
+                .build());
+
+        // Products for sender2
+        products.add(Product.builder()
+                .name("Paquet Express")
+                .slug("paquet-express")
+                .category("Express")
+                .unitPrice(new java.math.BigDecimal("20.00"))
+                .sender(sender2)
+                .build());
+
+        products.add(Product.builder()
+                .name("Document Urgent")
+                .slug("document-urgent")
+                .category("Documents")
+                .unitPrice(new java.math.BigDecimal("12.00"))
+                .sender(sender2)
+                .build());
+
+        products.add(Product.builder()
+                .name("Colis Lourd")
+                .slug("colis-lourd")
+                .category("Colis")
+                .unitPrice(new java.math.BigDecimal("25.00"))
+                .sender(sender2)
+                .build());
+
+        productRepo.saveAll(products);
     }
 
 }
