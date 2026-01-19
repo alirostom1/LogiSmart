@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DeliveryService } from '../../../../core/services/delivery.service';
 import { CourierService } from '../../../../core/services/courier.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { DeliveryDetails, DeliveryStatus, CourierResponse } from '../../../../core/models/delivery.model';
 
 @Component({
@@ -15,8 +16,32 @@ import { DeliveryDetails, DeliveryStatus, CourierResponse } from '../../../../co
 export class DeliveryDetailComponent implements OnInit {
   deliveryService = inject(DeliveryService);
   courierService = inject(CourierService);
+  authService = inject(AuthService);
   route = inject(ActivatedRoute);
   router = inject(Router);
+
+  isSender(): boolean {
+    const user = this.authService.getStoredUser();
+    return user?.role === 'ROLE_SENDER';
+  }
+
+  isCourier(): boolean {
+    const user = this.authService.getStoredUser();
+    return user?.role === 'ROLE_COURIER';
+  }
+
+  isManager(): boolean {
+    const user = this.authService.getStoredUser();
+    return user?.role === 'ROLE_MANAGER' || user?.role === 'ROLE_ADMIN';
+  }
+
+  canUpdateStatus(): boolean {
+    return !this.isSender();
+  }
+
+  canAssignCouriers(): boolean {
+    return this.isManager();
+  }
 
   delivery = signal<DeliveryDetails | null>(null);
   loading = signal(false);
@@ -31,23 +56,48 @@ export class DeliveryDetailComponent implements OnInit {
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
+    if (id && !isNaN(+id)) {
       this.loadDelivery(+id);
-      this.loadCouriers();
+    } else {
+      this.error.set('ID de livraison invalide');
+      this.loading.set(false);
     }
   }
 
-  loadCouriers() {
-    this.courierService.getAllCouriers(0, 100).subscribe({
+  loadCouriersForZone(zoneId: number | null | undefined) {
+    if (!zoneId || !this.canAssignCouriers()) {
+      return;
+    }
+
+    const currentCouriers = this.availableCouriers();
+    if (currentCouriers.length > 0 && currentCouriers[0].zone?.id === zoneId) {
+      return; // Already loaded
+    }
+
+    this.courierService.getCouriersByZone(zoneId, 0, 100).subscribe({
       next: (res) => {
         if (res?.success && res.data) {
           this.availableCouriers.set(res.data.content || []);
         }
       },
       error: () => {
-        console.error('Failed to load couriers');
+        console.error('Failed to load couriers for zone');
       }
     });
+  }
+
+  onCollectingCourierSelectOpen() {
+    const delivery = this.delivery();
+    if (delivery?.pickupZone?.id) {
+      this.loadCouriersForZone(delivery.pickupZone.id);
+    }
+  }
+
+  onShippingCourierSelectOpen() {
+    const delivery = this.delivery();
+    if (delivery?.shippingZone?.id) {
+      this.loadCouriersForZone(delivery.shippingZone.id);
+    }
   }
 
   loadDelivery(id: number) {
@@ -152,7 +202,13 @@ export class DeliveryDetailComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/deliveries']);
+    if (this.isSender()) {
+      this.router.navigate(['/deliveries/my-deliveries']);
+    } else if (this.isCourier()) {
+      this.router.navigate(['/dashboard/courier']);
+    } else {
+      this.router.navigate(['/deliveries']);
+    }
   }
 
   getStatusClass(status: string): string {

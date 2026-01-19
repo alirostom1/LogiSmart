@@ -15,4 +15,19 @@ export class SidebarComponent {
   logout() {
     this.authService.logout();
   }
+
+  isSender(): boolean {
+    const user = this.authService.getStoredUser();
+    return user?.role === 'ROLE_SENDER';
+  }
+
+  isManager(): boolean {
+    const user = this.authService.getStoredUser();
+    return user?.role === 'ROLE_MANAGER' || user?.role === 'ROLE_ADMIN';
+  }
+
+  isCourier(): boolean {
+    const user = this.authService.getStoredUser();
+    return user?.role === 'ROLE_COURIER';
+  }
 }

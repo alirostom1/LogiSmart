@@ -25,6 +25,7 @@ public interface DeliveryMapper {
             expression = "java(delivery.getCollectingCourier() != null ? delivery.getCollectingCourier().getFirstName() + \" \" + delivery.getCollectingCourier().getLastName() : null)")
     @Mapping(target = "shippingCourierName",
             expression = "java(delivery.getShippingCourier() != null ? delivery.getShippingCourier().getFirstName() + \" \" + delivery.getShippingCourier().getLastName() : null)")
+    @Mapping(target = "weight",source = "weightKg")
     @Mapping(target = "createdAt", source = "createdAt")
     @Mapping(target = "updatedAt", source = "updatedAt")
     DeliveryResponse toResponse(Delivery delivery);
@@ -33,6 +34,9 @@ public interface DeliveryMapper {
     @Mapping(target = "history", source = "deliveryHistoryList")
     @Mapping(target = "collectingCourier", source = "collectingCourier")
     @Mapping(target = "shippingCourier", source = "shippingCourier")
+    @Mapping(target = "pickupZone", source = "pickupZone")
+    @Mapping(target = "shippingZone", source = "shippingZone")
+    @Mapping(target = "weight",source = "weightKg")
     @Mapping(target = "createdAt", source = "createdAt")
     @Mapping(target = "updatedAt", source = "updatedAt")
     DeliveryDetailsResponse toDetailsResponse(Delivery delivery);

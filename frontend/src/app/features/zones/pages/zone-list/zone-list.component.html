@@ -1,0 +1,361 @@
+<div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Gestion des Zones</h1>
+    <div class="flex gap-2">
+      <button 
+        (click)="openCreateModal()" 
+        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        + Nouvelle Zone
+      </button>
+      <button 
+        (click)="openCreateWithPostalCodesModal()" 
+        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+        + Zone avec Codes Postaux
+      </button>
+    </div>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div *ngIf="success()" class="bg-green-100 text-green-700 p-3 rounded mb-4">{{success()}}</div>
+  <div *ngIf="error()" class="bg-red-100 text-red-700 p-3 rounded mb-4">{{error()}}</div>
+
+  <!-- Filters -->
+  <div class="bg-white p-4 rounded shadow mb-6">
+    <h2 class="text-lg font-semibold mb-4">Recherche</h2>
+    <div class="flex gap-4">
+      <input 
+        type="text" 
+        [value]="searchTerm()"
+        (input)="searchTerm.set($any($event.target).value); onSearch()"
+        (keyup.enter)="onSearch()"
+        class="flex-1 px-3 py-2 border rounded"
+        placeholder="Rechercher par nom, code, code postal...">
+      <button (click)="onSearch()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        Rechercher
+      </button>
+      <button (click)="onReset()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+        Réinitialiser
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading()" class="text-center py-8">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!loading()" class="bg-white rounded shadow overflow-hidden">
+    <table class="min-w-full">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Codes Postaux</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Créée le</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <tr *ngFor="let zone of zones()" class="hover:bg-gray-50">
+          <td class="px-6 py-4 text-sm font-medium">{{zone.name}}</td>
+          <td class="px-6 py-4 text-sm">
+            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-mono">
+              {{zone.code}}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-sm">
+            <span [class]="zone.active ? 'px-2 py-1 bg-green-100 text-green-800 rounded text-xs' : 'px-2 py-1 bg-red-100 text-red-800 rounded text-xs'">
+              {{zone.active ? 'Active' : 'Inactive'}}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-600">
+            {{getPostalCodesDisplay(zone)}}
+          </td>
+          <td class="px-6 py-4 text-sm">
+            <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">
+              {{zone.totalPostalCodes}}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-500">{{formatDate(zone.createdAt)}}</td>
+          <td class="px-6 py-4 text-sm">
+            <div class="flex flex-col gap-1">
+              <div class="flex gap-2">
+                <button 
+                  (click)="openEditModal(zone)" 
+                  class="text-blue-600 hover:text-blue-800 text-xs"
+                  title="Modifier">
+                  Modifier
+                </button>
+                <button 
+                  (click)="openAddPostalCodesModal(zone)" 
+                  class="text-green-600 hover:text-green-800 text-xs"
+                  title="Ajouter codes postaux">
+                  + Codes
+                </button>
+                <button 
+                  (click)="openRemovePostalCodesModal(zone)" 
+                  class="text-orange-600 hover:text-orange-800 text-xs"
+                  title="Retirer codes postaux">
+                  - Codes
+                </button>
+                <button 
+                  (click)="deleteZone(zone.id)" 
+                  class="text-red-600 hover:text-red-800 text-xs"
+                  title="Supprimer">
+                  Supprimer
+                </button>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="zones().length === 0">
+          <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+            Aucune zone trouvée
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading() && totalPages() > 1" class="mt-4 flex justify-between items-center">
+    <div class="text-sm text-gray-700">
+      Page {{currentPage() + 1}} / {{totalPages()}} ({{totalElements()}} zones)
+    </div>
+    <div class="flex gap-2">
+      <button 
+        (click)="onPageChange(currentPage() - 1)" 
+        [disabled]="currentPage() === 0"
+        class="px-4 py-2 border rounded disabled:bg-gray-100 disabled:text-gray-400 hover:bg-gray-50">
+        Précédent
+      </button>
+      <button 
+        (click)="onPageChange(currentPage() + 1)" 
+        [disabled]="currentPage() >= totalPages() - 1"
+        class="px-4 py-2 border rounded disabled:bg-gray-100 disabled:text-gray-400 hover:bg-gray-50">
+        Suivant
+      </button>
+    </div>
+  </div>
+
+  <!-- Create Modal -->
+  <div *ngIf="showCreateModal()" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <h2 class="text-xl font-bold mb-4">Créer une nouvelle zone</h2>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Nom *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="zoneForm.name"
+            class="w-full px-3 py-2 border rounded"
+            placeholder="Ex: Zone Nord"
+            required>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium mb-1">Code *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="zoneForm.code"
+            class="w-full px-3 py-2 border rounded"
+            placeholder="Ex: ZN"
+            maxlength="10"
+            required>
+          <p class="text-xs text-gray-500 mt-1">Maximum 10 caractères</p>
+        </div>
+      </div>
+      
+      <div class="flex gap-2 mt-6">
+        <button 
+          (click)="createZone()" 
+          [disabled]="loading() || !isFormValid()"
+          class="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400">
+          Créer
+        </button>
+        <button 
+          (click)="closeModals()" 
+          class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+          Annuler
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div *ngIf="showEditModal()" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <h2 class="text-xl font-bold mb-4">Modifier la zone</h2>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Nom *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="zoneForm.name"
+            class="w-full px-3 py-2 border rounded"
+            required>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium mb-1">Code *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="zoneForm.code"
+            class="w-full px-3 py-2 border rounded"
+            maxlength="10"
+            required>
+          <p class="text-xs text-gray-500 mt-1">Maximum 10 caractères</p>
+        </div>
+      </div>
+      
+      <div class="flex gap-2 mt-6">
+        <button 
+          (click)="updateZone()" 
+          [disabled]="loading() || !isFormValid()"
+          class="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400">
+          Mettre à jour
+        </button>
+        <button 
+          (click)="closeModals()" 
+          class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+          Annuler
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Zone with Postal Codes Modal -->
+  <div *ngIf="showCreateWithPostalCodesModal()" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <h2 class="text-xl font-bold mb-4">Créer une zone avec codes postaux</h2>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Nom *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="zoneWithPostalCodesForm.name"
+            class="w-full px-3 py-2 border rounded"
+            placeholder="Ex: Zone Nord"
+            required>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium mb-1">Code *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="zoneWithPostalCodesForm.code"
+            class="w-full px-3 py-2 border rounded"
+            placeholder="Ex: ZN"
+            maxlength="10"
+            required>
+          <p class="text-xs text-gray-500 mt-1">Maximum 10 caractères</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Codes Postaux *</label>
+          <textarea 
+            [(ngModel)]="postalCodesInput"
+            class="w-full px-3 py-2 border rounded"
+            rows="5"
+            placeholder="Entrez les codes postaux séparés par des virgules ou des retours à la ligne&#10;Ex: 75001, 75002, 75003&#10;ou&#10;75001&#10;75002&#10;75003"
+            required></textarea>
+          <p class="text-xs text-gray-500 mt-1">Séparez par des virgules ou des retours à la ligne</p>
+        </div>
+      </div>
+      
+      <div class="flex gap-2 mt-6">
+        <button 
+          (click)="createZoneWithPostalCodes()" 
+          [disabled]="loading() || !zoneWithPostalCodesForm.name || !zoneWithPostalCodesForm.code || !postalCodesInput()"
+          class="flex-1 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:bg-gray-400">
+          Créer
+        </button>
+        <button 
+          (click)="closeModals()" 
+          class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+          Annuler
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Postal Codes Modal -->
+  <div *ngIf="showAddPostalCodesModal()" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <h2 class="text-xl font-bold mb-4">Ajouter des codes postaux</h2>
+      <p class="text-sm text-gray-600 mb-4">Zone: <b>{{selectedZone()?.name}}</b></p>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Codes Postaux *</label>
+          <textarea 
+            [(ngModel)]="postalCodesInput"
+            class="w-full px-3 py-2 border rounded"
+            rows="5"
+            placeholder="Entrez les codes postaux séparés par des virgules ou des retours à la ligne"
+            required></textarea>
+          <p class="text-xs text-gray-500 mt-1">Séparez par des virgules ou des retours à la ligne</p>
+        </div>
+      </div>
+      
+      <div class="flex gap-2 mt-6">
+        <button 
+          (click)="addPostalCodes()" 
+          [disabled]="loading() || !postalCodesInput()"
+          class="flex-1 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:bg-gray-400">
+          Ajouter
+        </button>
+        <button 
+          (click)="closeModals()" 
+          class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+          Annuler
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Remove Postal Codes Modal -->
+  <div *ngIf="showRemovePostalCodesModal()" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <h2 class="text-xl font-bold mb-4">Retirer des codes postaux</h2>
+      <p class="text-sm text-gray-600 mb-4">Zone: <b>{{selectedZone()?.name}}</b></p>
+      
+      <div *ngIf="selectedZone()?.postalCodes && selectedZone()!.postalCodes.length > 0" class="space-y-2">
+        <p class="text-sm font-medium mb-2">Sélectionnez les codes postaux à retirer:</p>
+        <div class="max-h-60 overflow-y-auto border rounded p-2">
+          <label *ngFor="let pc of selectedZone()!.postalCodes" class="flex items-center gap-2 p-2 hover:bg-gray-50 cursor-pointer">
+            <input 
+              type="checkbox" 
+              [checked]="postalCodesToRemove().includes(pc)"
+              (change)="togglePostalCodeForRemoval(pc)"
+              class="rounded">
+            <span class="text-sm">{{pc}}</span>
+          </label>
+        </div>
+      </div>
+      <div *ngIf="!selectedZone()?.postalCodes || selectedZone()!.postalCodes.length === 0" class="text-gray-500 text-sm">
+        Aucun code postal dans cette zone
+      </div>
+      
+      <div class="flex gap-2 mt-6">
+        <button 
+          (click)="removePostalCodes()" 
+          [disabled]="loading() || postalCodesToRemove().length === 0"
+          class="flex-1 bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 disabled:bg-gray-400">
+          Retirer ({{postalCodesToRemove().length}})
+        </button>
+        <button 
+          (click)="closeModals()" 
+          class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+          Annuler
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

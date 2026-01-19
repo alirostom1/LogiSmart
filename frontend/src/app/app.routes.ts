@@ -7,6 +7,10 @@ export const routes: Routes = [
     loadChildren: () => import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES)
   },
   {
+    path: 'track',
+    loadChildren: () => import('./features/tracking/tracking.routes').then(m => m.TRACKING_ROUTES)
+  },
+  {
     path: '',
     loadComponent: () => import('./layouts/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
     canActivate: [authGuard],
@@ -31,6 +35,10 @@ export const routes: Routes = [
       {
         path: 'zones',
         loadChildren: () => import('./features/zones/zones.routes').then(m => m.ZONES_ROUTES)
+      },
+      {
+        path: 'products',
+        loadChildren: () => import('./features/products/products.routes').then(m => m.PRODUCTS_ROUTES)
       }
     ]
   },

@@ -91,7 +91,6 @@ public class ProductService {
         if (productRepo.existsByNameAndIdNotAndSenderId(request.getName(), productId,senderId)) {
             throw new ProductNameAlreadyExistsException(request.getName());
         }
-
         productMapper.updateFromRequest(request,product);
 
         Product updatedProduct = productRepo.save(product);

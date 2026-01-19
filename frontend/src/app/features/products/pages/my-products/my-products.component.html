@@ -1,10 +1,10 @@
 <div class="p-6">
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold">Gestion des Livreurs</h1>
+    <h1 class="text-2xl font-bold">Mes Produits</h1>
     <button 
       (click)="openCreateModal()" 
       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-      + Nouveau Livreur
+      + Nouveau Produit
     </button>
   </div>
 
@@ -22,7 +22,7 @@
         (input)="searchTerm.set($any($event.target).value); onSearch()"
         (keyup.enter)="onSearch()"
         class="flex-1 px-3 py-2 border rounded"
-        placeholder="Rechercher par nom, email, téléphone, véhicule...">
+        placeholder="Rechercher par nom, catégorie...">
       <button (click)="onSearch()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
         Rechercher
       </button>
@@ -42,44 +42,39 @@
       <thead class="bg-gray-50">
         <tr>
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Téléphone</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Véhicule</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Zone</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Catégorie</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prix Unitaire</th>
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-        <tr *ngFor="let courier of couriers()" class="hover:bg-gray-50">
+        <tr *ngFor="let product of products()" class="hover:bg-gray-50">
+          <td class="px-6 py-4 text-sm font-medium">{{product.name}}</td>
           <td class="px-6 py-4 text-sm">
-            {{courier.firstName}} {{courier.lastName}}
-          </td>
-          <td class="px-6 py-4 text-sm">{{courier.email}}</td>
-          <td class="px-6 py-4 text-sm">{{courier.phoneNumber}}</td>
-          <td class="px-6 py-4 text-sm">{{courier.vehicle}}</td>
-          <td class="px-6 py-4 text-sm">
-            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
-              {{courier.zone?.name || 'N/A'}}
+            <span *ngIf="product.category" class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+              {{product.category}}
             </span>
+            <span *ngIf="!product.category" class="text-gray-400 text-xs">N/A</span>
           </td>
+          <td class="px-6 py-4 text-sm font-semibold">{{formatPrice(product.unitPrice)}}</td>
           <td class="px-6 py-4 text-sm">
             <button 
-              (click)="openEditModal(courier)" 
+              (click)="openEditModal(product)" 
               class="text-blue-600 hover:text-blue-800 mr-4"
               title="Modifier">
               Modifier
             </button>
             <button 
-              (click)="deleteCourier(courier.id)" 
+              (click)="deleteProduct(product.id)" 
               class="text-red-600 hover:text-red-800"
               title="Supprimer">
               Supprimer
             </button>
           </td>
         </tr>
-        <tr *ngIf="couriers().length === 0">
-          <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-            Aucun livreur trouvé
+        <tr *ngIf="products().length === 0">
+          <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+            Aucun produit trouvé
           </td>
         </tr>
       </tbody>
@@ -89,7 +84,7 @@
   <!-- Pagination -->
   <div *ngIf="!loading() && totalPages() > 1" class="mt-4 flex justify-between items-center">
     <div class="text-sm text-gray-700">
-      Page {{currentPage() + 1}} / {{totalPages()}} ({{totalElements()}} livreurs)
+      Page {{currentPage() + 1}} / {{totalPages()}} ({{totalElements()}} produits)
     </div>
     <div class="flex gap-2">
       <button 
@@ -110,82 +105,46 @@
   <!-- Create Modal -->
   <div *ngIf="showCreateModal()" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
-      <h2 class="text-xl font-bold mb-4">Créer un nouveau livreur</h2>
+      <h2 class="text-xl font-bold mb-4">Créer un nouveau produit</h2>
       
       <div class="space-y-4">
         <div>
           <label class="block text-sm font-medium mb-1">Nom *</label>
           <input 
             type="text" 
-            [(ngModel)]="createForm.lastName"
+            [(ngModel)]="productForm.name"
             class="w-full px-3 py-2 border rounded"
+            placeholder="Ex: Produit ABC"
             required>
         </div>
         
         <div>
-          <label class="block text-sm font-medium mb-1">Prénom *</label>
+          <label class="block text-sm font-medium mb-1">Catégorie</label>
           <input 
             type="text" 
-            [(ngModel)]="createForm.firstName"
+            [(ngModel)]="productForm.category"
             class="w-full px-3 py-2 border rounded"
-            required>
+            placeholder="Ex: Électronique, Alimentaire..."
+            >
         </div>
         
         <div>
-          <label class="block text-sm font-medium mb-1">Email *</label>
+          <label class="block text-sm font-medium mb-1">Prix Unitaire (€) *</label>
           <input 
-            type="email" 
-            [(ngModel)]="createForm.email"
+            type="number" 
+            [(ngModel)]="productForm.unitPrice"
             class="w-full px-3 py-2 border rounded"
+            placeholder="0.00"
+            step="0.01"
+            min="0.01"
             required>
-        </div>
-        
-        <div>
-          <label class="block text-sm font-medium mb-1">Mot de passe *</label>
-          <input 
-            type="password" 
-            [(ngModel)]="createForm.password"
-            class="w-full px-3 py-2 border rounded"
-            required>
-        </div>
-        
-        <div>
-          <label class="block text-sm font-medium mb-1">Téléphone *</label>
-          <input 
-            type="text" 
-            [(ngModel)]="createForm.phone"
-            class="w-full px-3 py-2 border rounded"
-            required>
-        </div>
-        
-        <div>
-          <label class="block text-sm font-medium mb-1">Véhicule *</label>
-          <input 
-            type="text" 
-            [(ngModel)]="createForm.vehicle"
-            class="w-full px-3 py-2 border rounded"
-            placeholder="Ex: Moto, Voiture, Camion..."
-            required>
-        </div>
-        
-        <div>
-          <label class="block text-sm font-medium mb-1">Zone *</label>
-          <select 
-            [(ngModel)]="createForm.zoneId"
-            class="w-full px-3 py-2 border rounded"
-            required>
-            <option [value]="0">Sélectionner une zone</option>
-            <option *ngFor="let zone of zones()" [value]="zone.id">
-              {{zone.name}} ({{zone.code}})
-            </option>
-          </select>
         </div>
       </div>
       
       <div class="flex gap-2 mt-6">
         <button 
-          (click)="createCourier()" 
-          [disabled]="loading() || !isCreateFormValid()"
+          (click)="createProduct()" 
+          [disabled]="loading() || !isFormValid()"
           class="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400">
           Créer
         </button>
@@ -201,72 +160,43 @@
   <!-- Edit Modal -->
   <div *ngIf="showEditModal()" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
-      <h2 class="text-xl font-bold mb-4">Modifier le livreur</h2>
+      <h2 class="text-xl font-bold mb-4">Modifier le produit</h2>
       
       <div class="space-y-4">
         <div>
           <label class="block text-sm font-medium mb-1">Nom *</label>
           <input 
             type="text" 
-            [(ngModel)]="updateForm.lastName"
+            [(ngModel)]="productForm.name"
             class="w-full px-3 py-2 border rounded"
             required>
         </div>
         
         <div>
-          <label class="block text-sm font-medium mb-1">Prénom *</label>
+          <label class="block text-sm font-medium mb-1">Catégorie</label>
           <input 
             type="text" 
-            [(ngModel)]="updateForm.firstName"
+            [(ngModel)]="productForm.category"
             class="w-full px-3 py-2 border rounded"
-            required>
+            >
         </div>
         
         <div>
-          <label class="block text-sm font-medium mb-1">Email *</label>
+          <label class="block text-sm font-medium mb-1">Prix Unitaire (€) *</label>
           <input 
-            type="email" 
-            [(ngModel)]="updateForm.email"
+            type="number" 
+            [(ngModel)]="productForm.unitPrice"
             class="w-full px-3 py-2 border rounded"
+            step="0.01"
+            min="0.01"
             required>
-        </div>
-        
-        <div>
-          <label class="block text-sm font-medium mb-1">Téléphone *</label>
-          <input 
-            type="text" 
-            [(ngModel)]="updateForm.phoneNumber"
-            class="w-full px-3 py-2 border rounded"
-            required>
-        </div>
-        
-        <div>
-          <label class="block text-sm font-medium mb-1">Véhicule *</label>
-          <input 
-            type="text" 
-            [(ngModel)]="updateForm.vehicle"
-            class="w-full px-3 py-2 border rounded"
-            required>
-        </div>
-        
-        <div>
-          <label class="block text-sm font-medium mb-1">Zone *</label>
-          <select 
-            [(ngModel)]="updateForm.zoneId"
-            class="w-full px-3 py-2 border rounded"
-            required>
-            <option [value]="0">Sélectionner une zone</option>
-            <option *ngFor="let zone of zones()" [value]="zone.id">
-              {{zone.name}} ({{zone.code}})
-            </option>
-          </select>
         </div>
       </div>
       
       <div class="flex gap-2 mt-6">
         <button 
-          (click)="updateCourier()" 
-          [disabled]="loading() || !isUpdateFormValid()"
+          (click)="updateProduct()" 
+          [disabled]="loading() || !isFormValid()"
           class="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400">
           Mettre à jour
         </button>

@@ -29,8 +29,8 @@
       </div>
     </div>
 
-    <!-- Update Status -->
-    <div class="bg-white p-6 rounded shadow">
+    <!-- Update Status - Only for managers and couriers -->
+    <div *ngIf="canUpdateStatus()" class="bg-white p-6 rounded shadow">
       <h2 class="text-lg font-semibold mb-4">Mettre à jour le statut</h2>
       <div class="flex gap-4">
         <select [(ngModel)]="newStatus" class="flex-1 px-3 py-2 border rounded">
@@ -86,21 +86,25 @@
         <h2 class="text-lg font-semibold mb-4">Livraison</h2>
         <div class="space-y-2">
           <p><b>Poids:</b> {{delivery()!.weight}} kg</p>
-          <p *ngIf="delivery()!.zone?.name"><b>Zone:</b> {{delivery()!.zone?.name}}</p>
+          <p *ngIf="delivery()!.pickupZone"><b>Zone de collecte:</b> {{delivery()!.pickupZone?.name}} <span class="text-gray-500 text-xs">({{delivery()!.pickupZone?.code}})</span></p>
+          <p *ngIf="delivery()!.shippingZone"><b>Zone de livraison:</b> {{delivery()!.shippingZone?.name}} <span class="text-gray-500 text-xs">({{delivery()!.shippingZone?.code}})</span></p>
           <p><b>Créé:</b> {{formatDate(delivery()!.createdAt)}}</p>
           <p><b>Modifié:</b> {{formatDate(delivery()!.updatedAt)}}</p>
         </div>
       </div>
 
-      <!-- Couriers -->
-      <div class="bg-white p-6 rounded shadow">
+      <!-- Couriers - Only for managers -->
+      <div *ngIf="canAssignCouriers()" class="bg-white p-6 rounded shadow">
         <h2 class="text-lg font-semibold mb-4">Livreurs</h2>
         <div class="space-y-4">
           <!-- Collecting Courier -->
           <div>
             <label class="block text-sm font-medium mb-2">Livreur de collecte</label>
             <div class="flex gap-2">
-              <select [(ngModel)]="selectedCollectingCourier" class="flex-1 px-3 py-2 border rounded">
+              <select 
+                [(ngModel)]="selectedCollectingCourier" 
+                (focus)="onCollectingCourierSelectOpen()"
+                class="flex-1 px-3 py-2 border rounded">
                 <option [ngValue]="null">Sélectionner un livreur</option>
                 <option *ngFor="let courier of availableCouriers()" [ngValue]="courier.id">
                   {{courier.firstName}} {{courier.lastName}} - {{courier.zone?.name || 'N/A'}}
@@ -122,7 +126,10 @@
           <div>
             <label class="block text-sm font-medium mb-2">Livreur de livraison</label>
             <div class="flex gap-2">
-              <select [(ngModel)]="selectedShippingCourier" class="flex-1 px-3 py-2 border rounded">
+              <select 
+                [(ngModel)]="selectedShippingCourier" 
+                (focus)="onShippingCourierSelectOpen()"
+                class="flex-1 px-3 py-2 border rounded">
                 <option [ngValue]="null">Sélectionner un livreur</option>
                 <option *ngFor="let courier of availableCouriers()" [ngValue]="courier.id">
                   {{courier.firstName}} {{courier.lastName}} - {{courier.zone?.name || 'N/A'}}
@@ -139,6 +146,25 @@
               Actuellement: <b>{{delivery()!.shippingCourier?.firstName}} {{delivery()!.shippingCourier?.lastName}}</b>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Courier Info (Read-only for senders) -->
+      <div *ngIf="isSender()" class="bg-white p-6 rounded shadow">
+        <h2 class="text-lg font-semibold mb-4">Livreurs</h2>
+        <div class="space-y-2">
+          <p *ngIf="delivery()!.collectingCourier">
+            <b>Livreur de collecte:</b> {{delivery()!.collectingCourier?.firstName}} {{delivery()!.collectingCourier?.lastName}}
+          </p>
+          <p *ngIf="!delivery()!.collectingCourier" class="text-gray-500">
+            <b>Livreur de collecte:</b> Non assigné
+          </p>
+          <p *ngIf="delivery()!.shippingCourier">
+            <b>Livreur de livraison:</b> {{delivery()!.shippingCourier?.firstName}} {{delivery()!.shippingCourier?.lastName}}
+          </p>
+          <p *ngIf="!delivery()!.shippingCourier" class="text-gray-500">
+            <b>Livreur de livraison:</b> Non assigné
+          </p>
         </div>
       </div>
     </div>

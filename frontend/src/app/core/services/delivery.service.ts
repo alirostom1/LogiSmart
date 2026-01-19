@@ -103,4 +103,26 @@ export class DeliveryService {
       request
     );
   }
+
+  getMyDeliveries(page: number = 0, size: number = 100): Observable<ApiResponse<{ content: Delivery[]; totalElements: number; totalPages: number; number: number; size: number }>> {
+    let params = new HttpParams();
+    params = params.set('page', page.toString());
+    params = params.set('size', size.toString());
+
+    return this.http.get<ApiResponse<{ content: Delivery[]; totalElements: number; totalPages: number; number: number; size: number }>>(
+      `${this.apiUrl}deliveries/my-deliveries`,
+      { params }
+    );
+  }
+
+  getDeliveriesBySender(senderId: number, page: number = 0, size: number = 100): Observable<ApiResponse<{ content: Delivery[]; totalElements: number; totalPages: number; number: number; size: number }>> {
+    let params = new HttpParams();
+    params = params.set('page', page.toString());
+    params = params.set('size', size.toString());
+
+    return this.http.get<ApiResponse<{ content: Delivery[]; totalElements: number; totalPages: number; number: number; size: number }>>(
+      `${this.apiUrl}deliveries/sender/${senderId}`,
+      { params }
+    );
+  }
 }

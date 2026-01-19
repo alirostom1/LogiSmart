@@ -43,6 +43,8 @@ export class LoginComponent {
       .subscribe({
         next: (res) => {
           if (res?.success && res.data) {
+            console.log('Login successful, user data:', res.data);
+            console.log('User role:', res.data.role);
             this.authService.redirectBasedOnRole(res.data.role);
           } else if (res) {
             this.error = res.message || 'Erreur lors de la connexion';

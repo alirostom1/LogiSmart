@@ -34,7 +34,8 @@ public class DeliveryDetailsResponse {
     private RecipientResponse recipient;
     private CourierResponse collectingCourier;
     private CourierResponse shippingCourier;
-    private ZoneResponse zone;
+    private ZoneResponse pickupZone;
+    private ZoneResponse shippingZone;
     private List<ProductInDeliveryResponse> products;
     private List<DeliveryHistoryResponse> history;
     private LocalDateTime createdAt;

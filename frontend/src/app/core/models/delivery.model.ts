@@ -42,7 +42,8 @@ export interface DeliveryDetails {
   recipient: RecipientResponse;
   collectingCourier: CourierResponse | null;
   shippingCourier: CourierResponse | null;
-  zone?: ZoneResponse | null;
+  pickupZone?: ZoneResponse | null;
+  shippingZone?: ZoneResponse | null;
   products: ProductInDelivery[];
   history: DeliveryHistory[];
   createdAt: string;
@@ -64,7 +65,6 @@ export interface DeliveryTracking {
 
 export interface CreateDeliveryRequest {
   description: string;
-  destinationCity: string;
   weight: number;
   priority?: string; // Optional, can be empty string, "LOW", "MEDIUM", or "HIGH"
   pickupAddress: string;
@@ -125,6 +125,53 @@ export interface CreatePersonRequest {
   password: string;
   phone: string;
   address: string;
+}
+
+export interface CreateCourierRequest {
+  lastName: string;
+  firstName: string;
+  email: string;
+  password: string;
+  vehicle: string;
+  phone: string;
+  zoneId: number;
+}
+
+export interface UpdateCourierRequest {
+  lastName: string;
+  firstName: string;
+  vehicle: string;
+  email: string;
+  phoneNumber: string;
+  zoneId: number;
+}
+
+export interface CreateZoneRequest {
+  name: string;
+  code: string;
+}
+
+export interface CreateZoneWithPostalCodesRequest {
+  name: string;
+  code: string;
+  postalCodes: string[];
+}
+
+export interface PostalCodesRequest {
+  postalCodes: string[];
+}
+
+export interface ProductResponse {
+  id: number;
+  name: string;
+  category?: string;
+  unitPrice: number;
+}
+
+export interface CreateProductRequest {
+  name: string;
+  category?: string;
+  unitPrice: number;
 }
 
 export interface SenderResponse {

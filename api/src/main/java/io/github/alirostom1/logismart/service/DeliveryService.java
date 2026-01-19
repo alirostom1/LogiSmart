@@ -132,19 +132,6 @@ public class DeliveryService {
                                                         UpdateDeliveryStatusRequest request,
                                                         Long userId){
         Delivery delivery = findById(deliveryId);
-        
-        // Check if courier can only update their own deliveries
-        if (delivery.getCollectingCourier() != null && delivery.getCollectingCourier().getId().equals(userId)) {
-            // Courier can update
-        } else if (delivery.getShippingCourier() != null && delivery.getShippingCourier().getId().equals(userId)) {
-            // Courier can update
-        } else if (delivery.getCollectingCourier() == null && delivery.getShippingCourier() == null) {
-            // No courier assigned yet, manager can update
-        } else {
-            // Check if user is manager/admin
-            // This will be handled by security annotations
-        }
-        
         DeliveryStatus status = DeliveryStatus.valueOf(request.getStatus());
         delivery.setStatus(status);
         Delivery savedDelivery = deliveryRepo.save(delivery);
@@ -159,7 +146,7 @@ public class DeliveryService {
         Delivery delivery = findById(deliveryId);
         Courier courier = courierRepo.findById(request.getCourierId())
                 .orElseThrow(() -> new ResourceNotFoundException("Courier not found"));
-        if(delivery.getPickupZone().getId().equals(courier.getZone().getId())){
+        if(!delivery.getPickupZone().getId().equals(courier.getZone().getId())){
             throw new DeliveryCourierZoneMismatchException("Collecting courier isn't available for this specific pickup zone!");
         }
         delivery.setCollectingCourier(courier);
@@ -174,7 +161,7 @@ public class DeliveryService {
         Delivery delivery = findById(deliveryId);
         Courier courier = courierRepo.findById(request.getCourierId())
                 .orElseThrow(() -> new ResourceNotFoundException("Courier not found"));
-        if(delivery.getPickupZone().getId().equals(courier.getZone().getId())){
+        if(!delivery.getPickupZone().getId().equals(courier.getZone().getId())){
             throw new DeliveryCourierZoneMismatchException("Shipping courier isn't available for this specific shipping zone!");
         }
         delivery.setShippingCourier(courier);

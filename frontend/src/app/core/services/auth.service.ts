@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environment';
-import { AuthData, AuthResponse, LoginRequest, RegisterRequest } from '../models/user.model';
+import { AuthData, AuthResponse, LoginRequest, RegisterRequest, UserRole } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -87,16 +87,28 @@ export class AuthService {
     );
   }
 
-  redirectBasedOnRole(role: string): void {
-    if (role === 'ROLE_MANAGER' || role === 'ROLE_ADMIN') {
-      this.router.navigate(['/dashboard']);
-    } else if (role === 'ROLE_SENDER') {
-      console.log('Redirecting to sender deliveries');
-      this.router.navigate(['/my-deliveries']);
-    } else if (role === 'ROLE_COURIER') {
-      this.router.navigate(['/my-deliveries']);
+  redirectBasedOnRole(role: string | UserRole): void {
+    // Ensure role is a string
+    const roleStr: string = typeof role === 'string' ? role : String(role);
+    console.log('Redirecting based on role:', roleStr);
+    
+    if (roleStr === 'ROLE_MANAGER' || roleStr === 'ROLE_ADMIN') {
+      this.router.navigate(['/dashboard/manager']).then(() => {
+        console.log('Redirected to manager dashboard');
+      });
+    } else if (roleStr === 'ROLE_SENDER') {
+      this.router.navigate(['/dashboard/sender']).then(() => {
+        console.log('Redirected to sender dashboard');
+      });
+    } else if (roleStr === 'ROLE_COURIER') {
+      this.router.navigate(['/dashboard/courier']).then(() => {
+        console.log('Redirected to courier dashboard');
+      });
     } else {
-      this.router.navigate(['/dashboard']);
+      console.warn('Unknown role, redirecting to manager dashboard:', roleStr);
+      this.router.navigate(['/dashboard/manager']).then(() => {
+        console.log('Redirected to manager dashboard (default)');
+      });
     }
   }
 

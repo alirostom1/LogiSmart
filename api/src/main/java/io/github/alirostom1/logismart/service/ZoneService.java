@@ -4,6 +4,7 @@ package io.github.alirostom1.logismart.service;
 import io.github.alirostom1.logismart.dto.request.zone.AddPostalCodesToZoneRequest;
 import io.github.alirostom1.logismart.dto.request.zone.CreateZoneRequest;
 import io.github.alirostom1.logismart.dto.request.zone.CreateZoneWithPostalCodesRequest;
+import io.github.alirostom1.logismart.dto.request.zone.RemovePostalCodesFromZoneRequest;
 import io.github.alirostom1.logismart.dto.response.zone.ZoneResponse;
 import io.github.alirostom1.logismart.exception.ResourceNotFoundException;
 import io.github.alirostom1.logismart.exception.ZoneNotServicedException;
@@ -62,6 +63,9 @@ public class ZoneService {
                 .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
 
         request.postalCodes().forEach(pc -> {
+            if(zonePostalCodeRepo.existsByPostalCode(pc.strip().toUpperCase())){
+                throw new RuntimeException("Postal code already exists for another zone");
+            }
             ZonePostalCode zpc = new ZonePostalCode();
             zpc.setZone(zone);
             zpc.setPostalCode(pc.strip().toUpperCase());
@@ -80,13 +84,16 @@ public class ZoneService {
 
         List<ZonePostalCode> zonePostalCodes = request.postalCodes().stream()
                 .map(pc -> {
+                    if(zonePostalCodeRepo.existsByPostalCode(pc.strip().toUpperCase())){
+                        throw new RuntimeException("Postal code: " + pc.strip().toUpperCase() +" already exists for another zone");
+                    }
                     ZonePostalCode zpc = new ZonePostalCode();
                     zpc.setZone(zone);
                     zpc.setPostalCode(pc.strip().toUpperCase());
                     return zpc;
                 })
                 .toList();
-
+        zoneRepo.save(zone);
         zonePostalCodeRepo.saveAll(zonePostalCodes);
         return zoneMapper.toResponse(zone);
     }
@@ -117,6 +124,18 @@ public class ZoneService {
             throw new ResourceNotFoundException("Zone not found");
         }
         zoneRepo.deleteById(zoneId);
+    }
+
+    public void removePostalCodesFromZone(RemovePostalCodesFromZoneRequest request) {
+        Zone zone = zoneRepo.findById(request.zoneId())
+                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
+
+        List<String> postalCodesToRemove = request.postalCodes().stream()
+                .map(String::strip)
+                .map(String::toUpperCase)
+                .toList();
+
+        zonePostalCodeRepo.deleteByZoneIdAndPostalCodeIn(request.zoneId(), postalCodesToRemove);
     }
 
 }

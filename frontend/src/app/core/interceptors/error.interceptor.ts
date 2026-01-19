@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { environment } from '../../../../environment';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
@@ -18,24 +19,24 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
               if(response.success && response.data) {
                 const clonedReq = req.clone({
                   setHeaders: {
-                    Authorization: `Bearer ${response.data.tokenPair.accessToken}`
+                    Authorization: `${environment.token.tokenType} ${response.data.tokenPair.accessToken}`
                   }
                 });
                 return next(clonedReq);
               }
               authService.logout();
-              router.navigate(["/login"]);
+              router.navigate(["/auth/login"]);
               return throwError(() => error);
             }),
             catchError((refreshError) => {
               authService.logout();
-              router.navigate(['/login']);
+              router.navigate(['/auth/login']);
               return throwError(() => refreshError);
             })
           );
         }
         authService.logout();
-        router.navigate(['/login']);
+        router.navigate(['/auth/login']);
       } else if (error.status === 403) {
         router.navigate(['/unauthorized']);
       } else if (error.status === 0 || error.status === 504 || error.status === 408) {
