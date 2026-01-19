@@ -1,10 +1,13 @@
 package io.github.alirostom1.logismart.config;
 
+import io.github.alirostom1.logismart.exception.CustomAccessDeniedHandler;
+import io.github.alirostom1.logismart.exception.CustomAuthenticationEntryPoint;
 import io.github.alirostom1.logismart.filter.JWTFilter;
 import io.github.alirostom1.logismart.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -28,19 +31,25 @@ public class SecurityConfig {
     private final JWTFilter jwtFilter;
     private final AuthenticationProvider authenticationProvider;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
                 .csrf( csrf -> csrf.disable())
                 .cors( cors -> cors.configurationSource(corsConfigurationSource()))
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v3/auth/login",
                                 "/api/v3/auth/register",
                                 "/api/v3/auth/refresh",
-                                "/api/v3/auth/google",
-                                "/api/v3/auth/google/callback",
+                                "/api/v3/deliveries/tracking/**",
+                                "/oauth2/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/actuator/**"
@@ -65,6 +74,11 @@ public class SecurityConfig {
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2SuccessHandler)
+                        .failureHandler((request, response, exception) -> {
+                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"success\":false,\"message\":\"OAuth2 login failed\"}");
+                        })
                 );
 
         return http.build();

@@ -40,7 +40,7 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword())
         );
         User user = (User) authentication.getPrincipal();
-        String role = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).findFirst().orElse("ROLE_RECIPIENT");
+        String role = user.getRole().getName().name();
         TokenPair tokenPair = jwtService.generateTokenPair(user,null);
         return AuthResponse.builder()
                 .personResponse(personMapper.toResponse(user))
@@ -75,7 +75,7 @@ public class AuthService {
         return AuthResponse.builder()
                 .personResponse(personMapper.toResponse(user))
                 .tokenPair(tokenPair)
-                .role(user.getRole() + "")
+                .role(user.getRole().getName() + "")
                 .build();
     }
 }

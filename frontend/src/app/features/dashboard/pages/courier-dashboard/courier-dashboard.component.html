@@ -1,0 +1,235 @@
+<div class="max-w-7xl mx-auto p-6 space-y-6">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">Tableau de bord</h1>
+    <p class="text-gray-500 text-base">Bienvenue, {{ getCourierName() }}</p>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div *ngIf="success()" class="bg-green-100 text-green-700 p-3 rounded mb-4">{{success()}}</div>
+  <div *ngIf="error()" class="bg-red-100 text-red-700 p-3 rounded mb-4">{{error()}}</div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="flex flex-col items-center justify-center py-20">
+    <div class="relative">
+      <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 mx-auto"></div>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div class="h-8 w-8 bg-blue-600 rounded-full animate-pulse"></div>
+      </div>
+    </div>
+    <p class="text-gray-600 mt-6 text-lg font-medium">Chargement de vos livraisons...</p>
+  </div>
+
+  <!-- Stats Cards Grid -->
+  <div *ngIf="!loading()" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Total Card -->
+    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden border-l-4 border-gray-500">
+      <div class="p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500 text-xs font-semibold uppercase tracking-wide mb-1">Mes livraisons</p>
+            <p class="text-3xl font-bold text-gray-900">{{ stats().total }}</p>
+          </div>
+          <div class="bg-gray-100 p-3 rounded-lg">
+            <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Created Card -->
+    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden border-l-4 border-blue-500">
+      <div class="p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500 text-xs font-semibold uppercase tracking-wide mb-1">Créées</p>
+            <p class="text-3xl font-bold text-blue-600">{{ stats().created }}</p>
+          </div>
+          <div class="bg-blue-100 p-3 rounded-lg">
+            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Collected Card -->
+    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden border-l-4 border-yellow-500">
+      <div class="p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500 text-xs font-semibold uppercase tracking-wide mb-1">Collectées</p>
+            <p class="text-3xl font-bold text-yellow-600">{{ stats().collected }}</p>
+          </div>
+          <div class="bg-yellow-100 p-3 rounded-lg">
+            <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- In Stock Card -->
+    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden border-l-4 border-purple-500">
+      <div class="p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500 text-xs font-semibold uppercase tracking-wide mb-1">En stock</p>
+            <p class="text-3xl font-bold text-purple-600">{{ stats().inStock }}</p>
+          </div>
+          <div class="bg-purple-100 p-3 rounded-lg">
+            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- In Transit Card -->
+    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden border-l-4 border-indigo-500">
+      <div class="p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500 text-xs font-semibold uppercase tracking-wide mb-1">En transit</p>
+            <p class="text-3xl font-bold text-indigo-600">{{ stats().inTransit }}</p>
+          </div>
+          <div class="bg-indigo-100 p-3 rounded-lg">
+            <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivered Card -->
+    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden border-l-4 border-green-500">
+      <div class="p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500 text-xs font-semibold uppercase tracking-wide mb-1">Livrées</p>
+            <p class="text-3xl font-bold text-green-600">{{ stats().delivered }}</p>
+          </div>
+          <div class="bg-green-100 p-3 rounded-lg">
+            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deliveries Table -->
+  <div *ngIf="!loading()" class="bg-white rounded-lg shadow-md overflow-hidden mt-8">
+    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+          </svg>
+          <h2 class="text-lg font-semibold text-gray-900">Mes livraisons assignées</h2>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Empty State -->
+    <div *ngIf="deliveries().length === 0" class="p-12 text-center">
+      <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+      </svg>
+      <p class="text-gray-500 font-medium">Aucune livraison assignée</p>
+      <p class="text-gray-400 text-sm mt-1">Les nouvelles livraisons assignées apparaîtront ici</p>
+    </div>
+
+    <!-- Deliveries Table -->
+    <div *ngIf="deliveries().length > 0" class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Numéro de suivi</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Description</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Expéditeur</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Destinataire</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Statut</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Priorité</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let delivery of deliveries()" class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="text-sm font-mono font-semibold text-gray-900">{{ delivery.trackingNumber }}</span>
+            </td>
+            <td class="px-6 py-4">
+              <p class="text-sm text-gray-900 font-medium">{{ delivery.description }}</p>
+            </td>
+            <td class="px-6 py-4">
+              <p class="text-sm text-gray-700">{{ delivery.senderName }}</p>
+            </td>
+            <td class="px-6 py-4">
+              <p class="text-sm text-gray-700">{{ delivery.recipientName }}</p>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span [class]="'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ' + getStatusClass(delivery.status)">
+                {{ getStatusLabel(delivery.status) }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span [class]="'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ' + getPriorityClass(delivery.priority)">
+                {{ getPriorityLabel(delivery.priority) }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <p class="text-sm text-gray-600">{{ formatDate(delivery.createdAt) }}</p>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <div class="flex gap-2 items-center">
+                <button 
+                  *ngIf="canUpdateStatus(delivery.status) && getNextStatus(delivery.status)"
+                  (click)="updateStatus(delivery.id, getNextStatus(delivery.status)!)"
+                  [disabled]="loading()"
+                  class="text-blue-600 hover:text-blue-800 disabled:text-gray-400">
+                  Passer à {{ getStatusLabel(getNextStatus(delivery.status)!) }}
+                </button>
+                <a 
+                  [routerLink]="['/deliveries', delivery.id]" 
+                  class="text-blue-600 hover:text-blue-900 transition-colors">
+                  Détails
+                </a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading() && totalPages() > 1" class="mt-4 flex justify-between items-center">
+    <div class="text-sm text-gray-700">
+      Page {{currentPage() + 1}} / {{totalPages()}} ({{totalElements()}} livraisons)
+    </div>
+    <div class="flex gap-2">
+      <button 
+        (click)="onPageChange(currentPage() - 1)" 
+        [disabled]="currentPage() === 0"
+        class="px-4 py-2 border rounded disabled:bg-gray-100 disabled:text-gray-400 hover:bg-gray-50">
+        Précédent
+      </button>
+      <button 
+        (click)="onPageChange(currentPage() + 1)" 
+        [disabled]="currentPage() >= totalPages() - 1"
+        class="px-4 py-2 border rounded disabled:bg-gray-100 disabled:text-gray-400 hover:bg-gray-50">
+        Suivant
+      </button>
+    </div>
+  </div>
+</div>
+

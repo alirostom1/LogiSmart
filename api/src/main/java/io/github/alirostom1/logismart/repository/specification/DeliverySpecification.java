@@ -16,11 +16,12 @@ public class DeliverySpecification {
             String pattern = "%" + searchTerm.toLowerCase() + "%";
             return cb.or(
                     cb.like(cb.lower(root.get("description")), pattern),
-                    cb.like(cb.lower(root.get("pickupName")), pattern),
-                    cb.like(cb.lower(root.get("deliveryName")), pattern),
-                    cb.like(cb.lower(root.get("pickupPhone")), pattern),
-                    cb.like(cb.lower(root.get("deliveryPhone")), pattern),
-                    cb.like(cb.lower(root.get("trackingNumber")), pattern)
+                    cb.like(cb.lower(root.get("trackingNumber")), pattern),
+                    cb.like(cb.lower(root.get("sender").get("firstName")), pattern),
+                    cb.like(cb.lower(root.get("sender").get("lastName")), pattern),
+                    cb.like(cb.lower(root.get("sender").get("phone")), pattern),
+                    cb.like(cb.lower(root.get("recipient").get("name")), pattern),
+                    cb.like(cb.lower(root.get("recipient").get("phone")), pattern)
             );
         };
     }
@@ -45,7 +46,7 @@ public class DeliverySpecification {
 
     public static Specification<Delivery> hasDeliveryZone(Long zoneId) {
         return (root, query, cb) -> zoneId != null
-                ? cb.equal(root.get("deliveryZone").get("id"), zoneId)
+                ? cb.equal(root.get("shippingZone").get("id"), zoneId)
                 : cb.conjunction();
     }
 }

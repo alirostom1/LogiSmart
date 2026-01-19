@@ -16,6 +16,7 @@ public interface CourierMapper {
 
     @Mapping(target = "createdAt", source = "createdAt")
     @Mapping(target = "updatedAt", source = "updatedAt")
+    @Mapping(target="phoneNumber",source = "phone")
     CourierResponse toResponse(Courier courier);
 
     @Mapping(target = "totalDeliveries",

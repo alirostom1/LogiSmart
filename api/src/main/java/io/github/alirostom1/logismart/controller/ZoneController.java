@@ -1,6 +1,10 @@
 package io.github.alirostom1.logismart.controller;
 
+import io.github.alirostom1.logismart.dto.request.zone.AddPostalCodesToZoneRequest;
 import io.github.alirostom1.logismart.dto.request.zone.CreateZoneRequest;
+import io.github.alirostom1.logismart.dto.request.zone.CreateZoneWithPostalCodesRequest;
+import io.github.alirostom1.logismart.dto.request.zone.PostalCodesRequest;
+import io.github.alirostom1.logismart.dto.request.zone.RemovePostalCodesFromZoneRequest;
 import io.github.alirostom1.logismart.dto.response.common.DefaultApiResponse;
 import io.github.alirostom1.logismart.dto.response.zone.ZoneResponse;
 import io.github.alirostom1.logismart.service.ZoneService;
@@ -109,6 +113,58 @@ public class ZoneController {
         DefaultApiResponse<Void> defaultApiResponse = new DefaultApiResponse<>(
                 true,
                 "Zone deleted Successfully!",
+                null,
+                System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(defaultApiResponse);
+    }
+
+    @Operation(summary = "Create zone with postal codes")
+    @ApiResponse(responseCode = "201", description = "Zone created successfully with postal codes")
+    @PostMapping("/with-postal-codes")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
+    public ResponseEntity<DefaultApiResponse<ZoneResponse>> createZoneWithPostalCodes(
+            @Valid @RequestBody CreateZoneWithPostalCodesRequest request){
+        ZoneResponse zoneResponse = zoneService.createZoneWithPostalCodes(request);
+        DefaultApiResponse<ZoneResponse> defaultApiResponse = new DefaultApiResponse<>(
+                true,
+                "Zone Created Successfully with Postal Codes",
+                zoneResponse,
+                System.currentTimeMillis()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(defaultApiResponse);
+    }
+
+    @Operation(summary = "Add postal codes to zone")
+    @ApiResponse(responseCode = "200", description = "Postal codes added successfully")
+    @PostMapping("/{id}/postal-codes")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
+    public ResponseEntity<DefaultApiResponse<Void>> addPostalCodesToZone(
+            @Parameter(description = "Zone ID") @PathVariable("id") Long zoneId,
+            @Valid @RequestBody PostalCodesRequest request){
+        AddPostalCodesToZoneRequest requestWithId = new AddPostalCodesToZoneRequest(zoneId, request.postalCodes());
+        zoneService.addPostalCodesToZone(requestWithId);
+        DefaultApiResponse<Void> defaultApiResponse = new DefaultApiResponse<>(
+                true,
+                "Postal codes added successfully!",
+                null,
+                System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(defaultApiResponse);
+    }
+
+    @Operation(summary = "Remove postal codes from zone")
+    @ApiResponse(responseCode = "200", description = "Postal codes removed successfully")
+    @DeleteMapping("/{id}/postal-codes")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
+    public ResponseEntity<DefaultApiResponse<Void>> removePostalCodesFromZone(
+            @Parameter(description = "Zone ID") @PathVariable("id") Long zoneId,
+            @Valid @RequestBody PostalCodesRequest request){
+        RemovePostalCodesFromZoneRequest requestWithId = new RemovePostalCodesFromZoneRequest(zoneId, request.postalCodes());
+        zoneService.removePostalCodesFromZone(requestWithId);
+        DefaultApiResponse<Void> defaultApiResponse = new DefaultApiResponse<>(
+                true,
+                "Postal codes removed successfully!",
                 null,
                 System.currentTimeMillis()
         );

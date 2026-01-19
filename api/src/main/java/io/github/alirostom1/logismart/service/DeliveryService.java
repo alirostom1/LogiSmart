@@ -52,10 +52,13 @@ public class DeliveryService {
         Recipient recipient = recipientService.findOrCreateRecipient(request.getRecipientData());
 
         //GET ZONE
-        Zone pickupZone = zonePostalCodeRepo.findZoneByPostalCode(request.getPickupPostalCode())
+        ZonePostalCode pickupZonePC = zonePostalCodeRepo.findZoneByPostalCode(request.getPickupPostalCode())
                 .orElseThrow(() -> new ZoneNotServicedException("Pickup zone not available"));
-        Zone shippingZone = zonePostalCodeRepo.findZoneByPostalCode(request.getShippingPostalCode())
+        ZonePostalCode shippingZonePC = zonePostalCodeRepo.findZoneByPostalCode(request.getShippingPostalCode())
                 .orElseThrow(() -> new ZoneNotServicedException("Shipping zone not available"));
+
+        Zone pickupZone = shippingZonePC.getZone();
+        Zone shippingZone = shippingZonePC.getZone();
 
         //VALIDATE IF BOTH ZONES ARE ACTIVE
         zoneService.validateDeliveryZones(pickupZone,shippingZone);
@@ -66,6 +69,9 @@ public class DeliveryService {
         delivery.setRecipient(recipient);
         delivery.setPickupZone(pickupZone);
         delivery.setShippingZone(shippingZone);
+        
+        // GENERATE TRACKING NUMBER
+        delivery.setTrackingNumber(generateTrackingNumber(shippingZone));
 
         //SAVE DELIVERY
         Delivery savedDelivery = deliveryRepo.save(delivery);
@@ -126,19 +132,6 @@ public class DeliveryService {
                                                         UpdateDeliveryStatusRequest request,
                                                         Long userId){
         Delivery delivery = findById(deliveryId);
-        
-        // Check if courier can only update their own deliveries
-        if (delivery.getCollectingCourier() != null && delivery.getCollectingCourier().getId().equals(userId)) {
-            // Courier can update
-        } else if (delivery.getShippingCourier() != null && delivery.getShippingCourier().getId().equals(userId)) {
-            // Courier can update
-        } else if (delivery.getCollectingCourier() == null && delivery.getShippingCourier() == null) {
-            // No courier assigned yet, manager can update
-        } else {
-            // Check if user is manager/admin
-            // This will be handled by security annotations
-        }
-        
         DeliveryStatus status = DeliveryStatus.valueOf(request.getStatus());
         delivery.setStatus(status);
         Delivery savedDelivery = deliveryRepo.save(delivery);
@@ -153,7 +146,7 @@ public class DeliveryService {
         Delivery delivery = findById(deliveryId);
         Courier courier = courierRepo.findById(request.getCourierId())
                 .orElseThrow(() -> new ResourceNotFoundException("Courier not found"));
-        if(delivery.getPickupZone().getId().equals(courier.getZone().getId())){
+        if(!delivery.getPickupZone().getId().equals(courier.getZone().getId())){
             throw new DeliveryCourierZoneMismatchException("Collecting courier isn't available for this specific pickup zone!");
         }
         delivery.setCollectingCourier(courier);
@@ -168,7 +161,7 @@ public class DeliveryService {
         Delivery delivery = findById(deliveryId);
         Courier courier = courierRepo.findById(request.getCourierId())
                 .orElseThrow(() -> new ResourceNotFoundException("Courier not found"));
-        if(delivery.getPickupZone().getId().equals(courier.getZone().getId())){
+        if(!delivery.getPickupZone().getId().equals(courier.getZone().getId())){
             throw new DeliveryCourierZoneMismatchException("Shipping courier isn't available for this specific shipping zone!");
         }
         delivery.setShippingCourier(courier);
@@ -264,5 +257,14 @@ public class DeliveryService {
             deliveryProducts.add(deliveryProduct);
         }
         return deliveryProductRepo.saveAll(deliveryProducts);
+    }
+
+    // GENERATE TRACKING NUMBER
+    private String generateTrackingNumber(Zone shippingZone) {
+        String zoneCode = shippingZone.getCode() != null && !shippingZone.getCode().isBlank() 
+            ? shippingZone.getCode() 
+            : "LS";
+        String uniqueId = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        return zoneCode + "-" + uniqueId;
     }
 }

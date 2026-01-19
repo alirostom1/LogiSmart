@@ -18,4 +18,7 @@ public class Sender extends User {
     @OneToMany(mappedBy = "sender", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Delivery> deliveries = new ArrayList<>();
+    @OneToMany(mappedBy = "sender", fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Product> products = new ArrayList<>();
 }

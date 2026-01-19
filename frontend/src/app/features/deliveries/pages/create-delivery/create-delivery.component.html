@@ -1,0 +1,214 @@
+<div class="p-6 max-w-4xl mx-auto">
+  <button (click)="goBack()" class="mb-6 text-blue-600 hover:text-blue-800">
+    ← Retour
+  </button>
+
+  <h1 class="text-2xl font-bold mb-6">Nouvelle Livraison</h1>
+
+  <div *ngIf="error()" class="bg-red-100 text-red-700 p-3 rounded mb-4">{{error()}}</div>
+  <div *ngIf="success()" class="bg-green-100 text-green-700 p-3 rounded mb-4">{{success()}}</div>
+
+  <form (ngSubmit)="createDelivery()" class="space-y-6">
+    <!-- Delivery Info -->
+    <div class="bg-white p-6 rounded shadow">
+      <h2 class="text-lg font-semibold mb-4">Informations de livraison</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Description *</label>
+          <textarea 
+            [(ngModel)]="deliveryForm.description"
+            name="description"
+            class="w-full px-3 py-2 border rounded"
+            rows="3"
+            required></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Poids (kg) *</label>
+            <input 
+              type="number" 
+              [(ngModel)]="deliveryForm.weight"
+              name="weight"
+              class="w-full px-3 py-2 border rounded"
+              step="0.01"
+              min="0.01"
+              required>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-1">Priorité *</label>
+            <select 
+              [(ngModel)]="deliveryForm.priority"
+              name="priority"
+              class="w-full px-3 py-2 border rounded">
+              <option *ngFor="let priority of priorityOptions" [value]="priority">
+                {{priority === 'LOW' ? 'Basse' : priority === 'MEDIUM' ? 'Moyenne' : 'Haute'}}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pickup Address -->
+    <div class="bg-white p-6 rounded shadow">
+      <h2 class="text-lg font-semibold mb-4">Adresse de collecte</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Adresse *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="deliveryForm.pickupAddress"
+            name="pickupAddress"
+            class="w-full px-3 py-2 border rounded"
+            required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Code postal *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="deliveryForm.pickupPostalCode"
+            name="pickupPostalCode"
+            class="w-full px-3 py-2 border rounded"
+            pattern="[0-9]{5}"
+            maxlength="5"
+            required>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shipping Address -->
+    <div class="bg-white p-6 rounded shadow">
+      <h2 class="text-lg font-semibold mb-4">Adresse de livraison</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Adresse *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="deliveryForm.shippingAddress"
+            name="shippingAddress"
+            class="w-full px-3 py-2 border rounded"
+            required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Code postal *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="deliveryForm.shippingPostalCode"
+            name="shippingPostalCode"
+            class="w-full px-3 py-2 border rounded"
+            pattern="[0-9]{5}"
+            maxlength="5"
+            required>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recipient Info -->
+    <div class="bg-white p-6 rounded shadow">
+      <h2 class="text-lg font-semibold mb-4">Informations du destinataire</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Nom *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="deliveryForm.recipientData.name"
+            name="recipientName"
+            class="w-full px-3 py-2 border rounded"
+            required>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Email *</label>
+            <input 
+              type="email" 
+              [(ngModel)]="deliveryForm.recipientData.email"
+              name="recipientEmail"
+              class="w-full px-3 py-2 border rounded"
+              required>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-1">Téléphone *</label>
+            <input 
+              type="tel" 
+              [(ngModel)]="deliveryForm.recipientData.phone"
+              name="recipientPhone"
+              class="w-full px-3 py-2 border rounded"
+              required>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products -->
+    <div class="bg-white p-6 rounded shadow">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold">Produits (optionnel)</h2>
+        <button 
+          type="button"
+          (click)="addProductRow()" 
+          class="text-blue-600 hover:text-blue-800 text-sm">
+          + Ajouter un produit
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <div *ngFor="let selectedProduct of selectedProducts; let i = index" class="flex gap-4 items-end">
+          <div class="flex-1">
+            <label class="block text-sm font-medium mb-1">Produit</label>
+            <select 
+              [(ngModel)]="selectedProduct.product"
+              [name]="'product' + i"
+              class="w-full px-3 py-2 border rounded">
+              <option [ngValue]="null">Sélectionner un produit</option>
+              <option *ngFor="let product of availableProducts()" [ngValue]="product">
+                {{product.name}} - {{product.category || 'N/A'}}
+              </option>
+            </select>
+          </div>
+
+          <div class="w-32">
+            <label class="block text-sm font-medium mb-1">Quantité</label>
+            <input 
+              type="number" 
+              [(ngModel)]="selectedProduct.quantity"
+              [name]="'quantity' + i"
+              class="w-full px-3 py-2 border rounded"
+              min="1"
+              value="1">
+          </div>
+
+          <button 
+            type="button"
+            (click)="removeProductRow(i)" 
+            class="text-red-600 hover:text-red-800 px-3 py-2"
+            [disabled]="selectedProducts.length === 1">
+            Supprimer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="flex gap-4">
+      <button 
+        type="submit"
+        [disabled]="loading() || !isFormValid()"
+        class="flex-1 bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 disabled:bg-gray-400 font-medium">
+        Créer la livraison
+      </button>
+      <button 
+        type="button"
+        (click)="goBack()" 
+        class="px-6 py-3 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
+        Annuler
+      </button>
+    </div>
+  </form>
+</div>
+

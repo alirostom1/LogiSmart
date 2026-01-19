@@ -1,0 +1,25 @@
+<header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+  <div class="px-6 py-4">
+    <div class="flex items-center justify-between">
+      <!-- Left side - Page Title -->
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900">
+          {{ getPageTitle() }}
+        </h2>
+      </div>
+
+      <!-- Right side - User info -->
+      <div class="flex items-center space-x-3">
+        <div class="text-right hidden sm:block">
+          <p class="text-sm font-semibold text-gray-900">
+            {{ user?.personResponse?.firstName }} {{ user?.personResponse?.lastName }}
+          </p>
+          <p class="text-xs text-gray-500">{{ roleLabel }}</p>
+        </div>
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
+          {{ (user?.personResponse?.firstName?.[0] || 'U') + (user?.personResponse?.lastName?.[0] || '') }}
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

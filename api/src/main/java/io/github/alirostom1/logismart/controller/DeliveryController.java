@@ -56,10 +56,18 @@ public class DeliveryController {
             @ApiResponse(responseCode = "404", description = "Delivery not found")
     })
     @GetMapping("/{deliveryId}")
-    @PreAuthorize("hasAuthority('DELIVERY_READ')")
+    @PreAuthorize("hasAuthority('DELIVERY_READ') or hasAuthority('DELIVERY_READ_OWN')")
     public ResponseEntity<DefaultApiResponse<DeliveryDetailsResponse>> getDeliveryById(
             @Parameter(description = "Delivery ID")  @PathVariable Long deliveryId) {
-        DeliveryDetailsResponse response = deliveryService.getDeliveryById(deliveryId);
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        DeliveryDetailsResponse response;
+        // If user has DELIVERY_READ_OWN, check ownership
+        if (user.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("DELIVERY_READ_OWN"))) {
+            response = deliveryService.getDeliveryByIdWithOwnershipCheck(deliveryId, user.getId(), user.getRole().getName().name());
+        } else {
+            // Managers can see any delivery
+            response = deliveryService.getDeliveryById(deliveryId);
+        }
         DefaultApiResponse<DeliveryDetailsResponse> defaultApiResponse = new DefaultApiResponse<>(
                 true,
                 "Delivery retrieved successfully!",
@@ -219,14 +227,21 @@ public class DeliveryController {
         return ResponseEntity.ok(defaultApiResponse);
     }
 
-    @Operation(summary = "Get my deliveries (for courier)")
+    @Operation(summary = "Get my deliveries (for sender or courier)")
     @ApiResponse(responseCode = "200", description = "My deliveries retrieved successfully")
     @GetMapping("/my-deliveries")
     @PreAuthorize("hasAuthority('DELIVERY_READ_OWN')")
     public ResponseEntity<DefaultApiResponse<Page<DeliveryResponse>>> getMyDeliveries(
             @ParameterObject Pageable pageable) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Page<DeliveryResponse> response = deliveryService.getMyDeliveries(user.getId(), pageable);
+        Page<DeliveryResponse> response;
+        // If user is a sender, get deliveries by sender ID
+        if (user.getRole().getName().name().equals("ROLE_SENDER")) {
+            response = deliveryService.getDeliveriesBySender(user.getId(), pageable);
+        } else {
+            // For couriers, get deliveries assigned to them
+            response = deliveryService.getMyDeliveries(user.getId(), pageable);
+        }
         DefaultApiResponse<Page<DeliveryResponse>> defaultApiResponse = new DefaultApiResponse<>(
                 true,
                 "My deliveries retrieved successfully!",

@@ -1,0 +1,123 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-gray-900 mb-2">Suivi de Livraison</h1>
+      <p class="text-lg text-gray-600">Entrez votre numéro de suivi pour connaître le statut de votre colis</p>
+    </div>
+
+    <!-- Search Form -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+      <form (ngSubmit)="search()" class="flex gap-4">
+        <input
+          type="text"
+          [(ngModel)]="trackingNumber"
+          name="trackingNumber"
+          placeholder="Ex: ZC-326E24B0"
+          class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+          [disabled]="loading()">
+        <button
+          type="submit"
+          [disabled]="loading() || !trackingNumber.trim()"
+          class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold text-lg transition-colors">
+          <span *ngIf="!loading()">Rechercher</span>
+          <span *ngIf="loading()">Recherche...</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error()" class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg mb-6">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <p>{{ error() }}</p>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading()" class="bg-white rounded-lg shadow-lg p-12 text-center">
+      <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 mx-auto mb-4"></div>
+      <p class="text-gray-600 text-lg">Recherche en cours...</p>
+    </div>
+
+    <!-- Tracking Results -->
+    <div *ngIf="!loading() && tracking()" class="bg-white rounded-lg shadow-lg overflow-hidden">
+      <!-- Header Card -->
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm opacity-90 mb-1">Numéro de suivi</p>
+            <h2 class="text-2xl font-bold font-mono">{{ tracking()!.trackingNumber }}</h2>
+          </div>
+          <div class="text-right">
+            <span [class]="'px-4 py-2 rounded-lg text-sm font-semibold bg-white/20 backdrop-blur-sm ' + getStatusClass(tracking()!.currentStatus)">
+              {{ getStatusLabel(tracking()!.currentStatus) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="p-6 space-y-6">
+        <!-- Description -->
+        <div>
+          <h3 class="text-sm font-semibold text-gray-500 uppercase mb-2">Description</h3>
+          <p class="text-lg text-gray-900">{{ tracking()!.description }}</p>
+        </div>
+
+        <!-- Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Sender -->
+          <div class="bg-gray-50 rounded-lg p-4">
+            <h3 class="text-sm font-semibold text-gray-500 uppercase mb-2">Expéditeur</h3>
+            <p class="text-lg text-gray-900">{{ tracking()!.senderName }}</p>
+          </div>
+
+          <!-- Recipient -->
+          <div class="bg-gray-50 rounded-lg p-4">
+            <h3 class="text-sm font-semibold text-gray-500 uppercase mb-2">Destinataire</h3>
+            <p class="text-lg text-gray-900">{{ tracking()!.recipientName }}</p>
+          </div>
+
+          <!-- Destination -->
+          <div *ngIf="tracking()!.destinationCity" class="bg-gray-50 rounded-lg p-4">
+            <h3 class="text-sm font-semibold text-gray-500 uppercase mb-2">Destination</h3>
+            <p class="text-lg text-gray-900">{{ tracking()!.destinationCity }}</p>
+          </div>
+
+          <!-- Last Update -->
+          <div class="bg-gray-50 rounded-lg p-4">
+            <h3 class="text-sm font-semibold text-gray-500 uppercase mb-2">Dernière mise à jour</h3>
+            <p class="text-lg text-gray-900">{{ formatDate(tracking()!.lastUpdate) }}</p>
+          </div>
+        </div>
+
+        <!-- Couriers -->
+        <div *ngIf="tracking()!.collectingCourierName || tracking()!.shippingCourierName" class="border-t pt-6">
+          <h3 class="text-sm font-semibold text-gray-500 uppercase mb-4">Livreurs assignés</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div *ngIf="tracking()!.collectingCourierName" class="bg-blue-50 rounded-lg p-4">
+              <p class="text-sm text-gray-600 mb-1">Livreur de collecte</p>
+              <p class="text-lg font-semibold text-gray-900">{{ tracking()!.collectingCourierName }}</p>
+            </div>
+            <div *ngIf="tracking()!.shippingCourierName" class="bg-green-50 rounded-lg p-4">
+              <p class="text-sm text-gray-600 mb-1">Livreur de livraison</p>
+              <p class="text-lg font-semibold text-gray-900">{{ tracking()!.shippingCourierName }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading() && !tracking() && !error()" class="bg-white rounded-lg shadow-lg p-12 text-center">
+      <svg class="w-24 h-24 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+      </svg>
+      <p class="text-gray-500 text-lg">Entrez un numéro de suivi pour commencer</p>
+    </div>
+  </div>
+</div>
+
